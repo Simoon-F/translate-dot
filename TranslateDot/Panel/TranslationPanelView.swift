@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct TranslationPanelView: View {
@@ -11,12 +12,21 @@ struct TranslationPanelView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .padding(16)
         }
-        .frame(width: 440, height: 350)
+        .frame(
+            minWidth: AppSettings.minimumPanelSize.width,
+            minHeight: AppSettings.minimumPanelSize.height
+        )
         .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .strokeBorder(.primary.opacity(0.10), lineWidth: 1)
+        }
+        .overlay(alignment: .bottomTrailing) {
+            PanelResizeHandle()
+                .frame(width: 28, height: 28)
+                .padding(3)
+                .accessibilityLabel(L10n.string("panel.resize", defaultValue: "Resize Window"))
         }
     }
 
@@ -106,41 +116,74 @@ struct TranslationPanelView: View {
         }
     }
 
-    private func successView(original: String, translated: String, source: String, target: String, copied: Bool) -> some View {
+    private func successView(
+        original: String,
+        translated: String,
+        source: String,
+        target: String,
+        copied: TranslationCopyTarget?
+    ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
+            Text("\(source) → \(target)")
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.secondary)
+
+            VSplitView {
+                textSection(
+                    title: L10n.string("panel.original", defaultValue: "Original"),
+                    text: original,
+                    isOriginal: true,
+                    copied: copied == .original,
+                    copyTitle: L10n.string("panel.copy_original", defaultValue: "Copy Original"),
+                    action: viewModel.copyOriginal
+                )
+                .frame(minHeight: 110)
+
+                textSection(
+                    title: L10n.string("panel.translation", defaultValue: "Translation"),
+                    text: translated,
+                    isOriginal: false,
+                    copied: copied == .translation,
+                    copyTitle: L10n.string("panel.copy_translation", defaultValue: "Copy Translation"),
+                    action: viewModel.copyTranslation
+                )
+                .frame(minHeight: 140)
+            }
+        }
+    }
+
+    private func textSection(
+        title: String,
+        text: String,
+        isOriginal: Bool,
+        copied: Bool,
+        copyTitle: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("\(source) → \(target)")
-                    .font(.caption)
+                Text(title)
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                 Spacer()
-                Button {
-                    viewModel.copyTranslation()
-                } label: {
+                Button(action: action) {
                     Label(
-                        copied
-                            ? L10n.string("panel.copied", defaultValue: "Copied")
-                            : L10n.string("panel.copy_translation", defaultValue: "Copy Translation"),
+                        copied ? L10n.string("panel.copied", defaultValue: "Copied") : copyTitle,
                         systemImage: copied ? "checkmark" : "doc.on.doc"
                     )
                 }
                 .buttonStyle(.borderless)
             }
-
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    Text(original)
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Divider()
-                    Text(translated)
-                        .font(.body)
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
+                Text(text)
+                    .font(isOriginal ? .callout : .body)
+                    .foregroundStyle(isOriginal ? .secondary : .primary)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.trailing, 10)
             }
         }
+        .padding(.vertical, 6)
     }
 
     private var permissionView: some View {
@@ -188,5 +231,69 @@ struct TranslationPanelView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+}
+
+private struct PanelResizeHandle: NSViewRepresentable {
+    func makeNSView(context: Context) -> ResizeHandleView {
+        ResizeHandleView()
+    }
+
+    func updateNSView(_ nsView: ResizeHandleView, context: Context) {}
+}
+
+private final class ResizeHandleView: NSView {
+    private var initialWindowFrame: CGRect?
+    private var initialMouseLocation: CGPoint?
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+    override func resetCursorRects() {
+        addCursorRect(bounds, cursor: .crosshair)
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        guard let image = NSImage(
+            systemSymbolName: "arrow.up.left.and.arrow.down.right",
+            accessibilityDescription: nil
+        ) else { return }
+        image.isTemplate = true
+        image.draw(
+            in: bounds.insetBy(dx: 7, dy: 7),
+            from: .zero,
+            operation: .sourceOver,
+            fraction: 0.45,
+            respectFlipped: true,
+            hints: nil
+        )
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        initialWindowFrame = window?.frame
+        initialMouseLocation = NSEvent.mouseLocation
+    }
+
+    override func mouseDragged(with event: NSEvent) {
+        guard let window,
+              let initialWindowFrame,
+              let initialMouseLocation else { return }
+
+        let currentMouseLocation = NSEvent.mouseLocation
+        let width = min(
+            max(initialWindowFrame.width + currentMouseLocation.x - initialMouseLocation.x, window.minSize.width),
+            window.maxSize.width
+        )
+        let height = min(
+            max(initialWindowFrame.height - currentMouseLocation.y + initialMouseLocation.y, window.minSize.height),
+            window.maxSize.height
+        )
+        let frame = CGRect(
+            x: initialWindowFrame.minX,
+            y: initialWindowFrame.maxY - height,
+            width: width,
+            height: height
+        )
+        window.setFrame(frame, display: true)
     }
 }

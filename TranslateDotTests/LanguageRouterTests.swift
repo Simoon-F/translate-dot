@@ -35,6 +35,41 @@ final class LanguageRouterTests: XCTestCase {
         XCTAssertNil(route.source)
     }
 
+    func testCustomFixedTargetLanguage() {
+        let preferences = LanguageRoutingPreferences(
+            sourceLanguageIdentifier: nil,
+            targetLanguageIdentifier: "ja",
+            automaticallyReverseLanguages: false,
+            reverseTargetLanguageIdentifier: "en"
+        )
+        let route = router.route(
+            detectedLanguage: Locale.Language(identifier: "en"),
+            preferences: preferences
+        )
+        XCTAssertEqual(route.target.languageCode?.identifier, "ja")
+    }
+
+    func testCustomReverseLanguage() {
+        let preferences = LanguageRoutingPreferences(
+            sourceLanguageIdentifier: nil,
+            targetLanguageIdentifier: "ja",
+            automaticallyReverseLanguages: true,
+            reverseTargetLanguageIdentifier: "fr"
+        )
+        let route = router.route(
+            detectedLanguage: Locale.Language(identifier: "ja"),
+            preferences: preferences
+        )
+        XCTAssertEqual(route.target.languageCode?.identifier, "fr")
+    }
+
+    func testChineseVariantsBelongToSameLanguageFamily() {
+        XCTAssertTrue(LanguageRouter.sameLanguageFamily(
+            Locale.Language(identifier: "zh-Hant"),
+            Locale.Language(identifier: "zh-Hans")
+        ))
+    }
+
     private func assertRoute(_ source: String, target: String) {
         let language = Locale.Language(identifier: source)
         let route = router.route(detectedLanguage: language)

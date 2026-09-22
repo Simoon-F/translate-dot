@@ -1,221 +1,980 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "error.ax_failure" : {
+    "%@ → %@" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't read the selected text. Try again." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "读取选中文本失败，请重试。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ → %2$@"
+          }
+        }
+      }
+    },
+    "%@ × %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ × %2$@"
+          }
+        }
+      }
+    },
+    "error.ax_failure" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't read the selected text. Try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "读取选中文本失败，请重试。"
+          }
+        }
       }
     },
     "error.empty_translation" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "The system returned no translation. Try again." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "系统没有返回翻译结果，请重试。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The system returned no translation. Try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统没有返回翻译结果，请重试。"
+          }
+        }
       }
     },
     "error.focus_unavailable" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't read the current focus. Return to the original app and select the text again." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法读取当前焦点。请返回原应用并重新选择文本。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't read the current focus. Return to the original app and select the text again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法读取当前焦点。请返回原应用并重新选择文本。"
+          }
+        }
       }
     },
     "error.no_selection" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select some text first." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请先选择需要翻译的文本。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select some text first."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请先选择需要翻译的文本。"
+          }
+        }
       }
     },
     "error.nothing_to_translate" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "The selected text contains nothing to translate." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选中的文本没有可翻译内容。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected text contains nothing to translate."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选中的文本没有可翻译内容。"
+          }
+        }
       }
     },
     "error.permission_required" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Accessibility permission is required to read selected text in other apps." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "需要辅助功能权限才能读取其他应用中选中的文本。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility permission is required to read selected text in other apps."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要辅助功能权限才能读取其他应用中选中的文本。"
+          }
+        }
       }
     },
     "error.same_language" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "The source and target languages are the same." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "检测到源语言与目标语言相同。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The source and target languages are the same."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "检测到源语言与目标语言相同。"
+          }
+        }
       }
     },
     "error.selection_too_long" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "The selected text is too long. Keep it under %lld characters." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选中的文本过长，请控制在 %lld 个字符以内。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected text is too long. Keep it under %lld characters."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选中的文本过长，请控制在 %lld 个字符以内。"
+          }
+        }
       }
     },
     "error.selection_unsupported" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "This app doesn't currently support direct text selection." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "当前应用暂不支持直接取词。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app doesn't currently support direct text selection."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前应用暂不支持直接取词。"
+          }
+        }
       }
     },
     "error.translation_failed" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Translation failed. Check the language model and try again." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "翻译失败。请检查语言模型后重试。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation failed. Check the language model and try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译失败。请检查语言模型后重试。"
+          }
+        }
       }
     },
     "error.translation_unsupported" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Apple Translation doesn't support this language pair." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Apple Translation 暂不支持当前语言组合。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Translation doesn't support this language pair."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Translation 暂不支持当前语言组合。"
+          }
+        }
       }
     },
     "error.unable_identify_language" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't reliably identify the source language. Select a longer passage and try again." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法可靠识别源语言，请选择更完整的文本后重试。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't reliably identify the source language. Select a longer passage and try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法可靠识别源语言，请选择更完整的文本后重试。"
+          }
+        }
       }
     },
     "hotkey.conflict" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Global shortcut ⌥D is used by another app. Close the conflicting app and restart TranslateDot." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "全局快捷键 ⌥D 已被其他应用占用，请关闭冲突应用后重新启动 TranslateDot。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Global shortcut ⌥D is used by another app. Close the conflicting app and restart TranslateDot."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全局快捷键 ⌥D 已被其他应用占用，请关闭冲突应用后重新启动 TranslateDot。"
+          }
+        }
       }
     },
     "hotkey.registration_failed" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't register global shortcut ⌥D. Restart the app." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法注册全局快捷键 ⌥D，请重新启动应用。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't register global shortcut ⌥D. Restart the app."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法注册全局快捷键 ⌥D，请重新启动应用。"
+          }
+        }
       }
     },
     "language.auto_detect" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Auto-detect" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "自动检测" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-detect"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动检测"
+          }
+        }
       }
     },
     "menu.about" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "About TranslateDot" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关于 TranslateDot" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About TranslateDot"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关于 TranslateDot"
+          }
+        }
       }
     },
     "menu.accessibility_granted" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Accessibility Permission: Granted" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "辅助功能权限：已授权" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility Permission: Granted"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "辅助功能权限：已授权"
+          }
+        }
       }
     },
     "menu.open_accessibility_settings" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Accessibility Settings…" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开辅助功能设置…" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Accessibility Settings…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开辅助功能设置…"
+          }
+        }
       }
     },
     "menu.quit" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quit TranslateDot" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "退出 TranslateDot" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quit TranslateDot"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出 TranslateDot"
+          }
+        }
+      }
+    },
+    "menu.settings" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置…"
+          }
+        }
       }
     },
     "menu.translate_selection" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Translate Selection" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "翻译所选文本" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate Selection"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译所选文本"
+          }
+        }
       }
     },
     "panel.check_again" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check Again" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重新检查" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check Again"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新检查"
+          }
+        }
       }
     },
     "panel.checking_language" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Checking language…" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在检查语言…" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking language…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在检查语言…"
+          }
+        }
       }
     },
     "panel.close" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Close" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关闭" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
+        }
       }
     },
     "panel.copied" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Copied" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已复制" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已复制"
+          }
+        }
+      }
+    },
+    "panel.copy_original" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Original"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制原文"
+          }
+        }
       }
     },
     "panel.copy_translation" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Copy Translation" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "复制译文" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Translation"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制译文"
+          }
+        }
       }
     },
     "panel.failure_title" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Translation Incomplete" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "翻译未完成" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation Incomplete"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译未完成"
+          }
+        }
       }
     },
     "panel.idle_message" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "TranslateDot will show the system translation here." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "TranslateDot 会在这里显示系统翻译结果。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TranslateDot will show the system translation here."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TranslateDot 会在这里显示系统翻译结果。"
+          }
+        }
       }
     },
     "panel.idle_title" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select text, then press ⌥D" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择文本后按 ⌥D" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select text, then press ⌥D"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择文本后按 ⌥D"
+          }
+        }
       }
     },
     "panel.no_selection_title" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "No translatable selection" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "没有可翻译的选区" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No translatable selection"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有可翻译的选区"
+          }
+        }
       }
     },
     "panel.open_settings" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open System Settings" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开系统设置" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open System Settings"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开系统设置"
+          }
+        }
+      }
+    },
+    "panel.original" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "原文"
+          }
+        }
       }
     },
     "panel.permission_message" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "TranslateDot only uses this permission to read text you explicitly select. After granting access, the app checks automatically." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "TranslateDot 只使用此权限读取你主动选中的文本。授权后，应用会自动检查权限是否已经生效。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TranslateDot only uses this permission to read text you explicitly select. After granting access, the app checks automatically."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TranslateDot 只使用此权限读取你主动选中的文本。授权后，应用会自动检查权限是否已经生效。"
+          }
+        }
       }
     },
     "panel.permission_title" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Accessibility Permission Required" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "需要辅助功能权限" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility Permission Required"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要辅助功能权限"
+          }
+        }
       }
     },
     "panel.preparing_model" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Preparing language model…" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在准备语言模型…" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparing language model…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在准备语言模型…"
+          }
+        }
+      }
+    },
+    "panel.resize" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resize Window"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "调整窗口大小"
+          }
+        }
+      }
+    },
+    "panel.translation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "译文"
+          }
+        }
       }
     },
     "panel.unsupported_title" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not Supported" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "暂不支持" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Supported"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂不支持"
+          }
+        }
       }
     },
     "permission.activated" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Permission is active. Return to the original app, select the text again, then press ⌥D." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "权限已生效。请返回原应用、重新选择文本，然后按 ⌥D。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permission is active. Return to the original app, select the text again, then press ⌥D."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "权限已生效。请返回原应用、重新选择文本，然后按 ⌥D。"
+          }
+        }
       }
     },
     "permission.granted" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Permission granted. Select text in another app, then press ⌥D." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "权限已授予。请在其他应用中选择文本，然后按 ⌥D。" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permission granted. Select text in another app, then press ⌥D."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "权限已授予。请在其他应用中选择文本，然后按 ⌥D。"
+          }
+        }
       }
+    },
+    "settings.auto_reverse" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically reverse when the source matches the target"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "源语言与目标语言相同时自动反向翻译"
+          }
+        }
+      }
+    },
+    "settings.general_tab" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通用"
+          }
+        }
+      }
+    },
+    "settings.language_footer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Languages are provided by Apple Translation. A language model may download the first time you use a pair."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语言列表由 Apple 翻译提供。首次使用某个语言组合时，系统可能需要下载语言模型。"
+          }
+        }
+      }
+    },
+    "settings.languages" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Languages"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语言"
+          }
+        }
+      }
+    },
+    "settings.reset_panel_size" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Window Size"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "恢复默认窗口大小"
+          }
+        }
+      }
+    },
+    "settings.reverse_target" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reverse Target Language"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "反向目标语言"
+          }
+        }
+      }
+    },
+    "settings.saved_size" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Size"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已保存尺寸"
+          }
+        }
+      }
+    },
+    "settings.selection_shortcut" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate Selection"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "划词翻译"
+          }
+        }
+      }
+    },
+    "settings.shortcut_footer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select text in another app, then press this shortcut."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在其他应用中选择文本，然后按下此快捷键。"
+          }
+        }
+      }
+    },
+    "settings.shortcuts" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard Shortcut"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快捷键"
+          }
+        }
+      }
+    },
+    "settings.source_language" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source Language"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "源语言"
+          }
+        }
+      }
+    },
+    "settings.target_language" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default Target Language"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "默认目标语言"
+          }
+        }
+      }
+    },
+    "settings.translation_tab" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译"
+          }
+        }
+      }
+    },
+    "settings.translation_window" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation Window"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译窗口"
+          }
+        }
+      }
+    },
+    "settings.window_footer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag the lower-right corner of the translation window to resize it. The size is remembered automatically."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拖动翻译窗口右下角即可调整大小，应用会自动记住尺寸。"
+          }
+        }
+      }
+    },
+    "TranslateDot" : {
+
     }
   },
   "version" : "1.0"

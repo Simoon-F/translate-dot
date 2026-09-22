@@ -23,6 +23,7 @@ final class TranslationCoordinator: ObservableObject {
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.simon.translatedot", category: "Translation")
     private let viewModel: TranslationViewModel
+    private let settings: AppSettings
     private let router: LanguageRouter
     private let availability: LanguageAvailability
     private var preflightTask: Task<Void, Never>?
@@ -31,10 +32,12 @@ final class TranslationCoordinator: ObservableObject {
 
     init(
         viewModel: TranslationViewModel,
+        settings: AppSettings = .shared,
         router: LanguageRouter = LanguageRouter(),
         availability: LanguageAvailability = LanguageAvailability()
     ) {
         self.viewModel = viewModel
+        self.settings = settings
         self.router = router
         self.availability = availability
     }
@@ -51,7 +54,7 @@ final class TranslationCoordinator: ObservableObject {
     }
 
     private func prepare(_ request: TranslationRequest) async {
-        let route = router.route(text: request.text)
+        let route = router.route(text: request.text, preferences: settings.routingPreferences)
         do {
             let status: LanguageAvailability.Status
             if let source = route.source {

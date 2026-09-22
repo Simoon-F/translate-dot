@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import XCTest
 @testable import TranslateDot
@@ -84,6 +85,33 @@ final class TranslationViewModelTests: XCTestCase {
             return XCTFail("Expected latest request to remain visible")
         }
         XCTAssertEqual(translated, "最新结果")
+    }
+
+    func testCopiesOriginalAndTranslationSeparately() {
+        let pasteboard = NSPasteboard(name: .init("TranslateDotTests.\(UUID().uuidString)"))
+        let viewModel = TranslationViewModel(pasteboard: pasteboard)
+        let request = TranslationRequest(text: "Hello")
+        viewModel.showLoading(for: request)
+        viewModel.showSuccess(
+            Self.result("你好"),
+            for: request,
+            sourceLabel: "English",
+            targetLabel: "Chinese"
+        )
+
+        viewModel.copyOriginal()
+        XCTAssertEqual(pasteboard.string(forType: .string), "Hello")
+        guard case .success(_, _, _, _, let copiedOriginal) = viewModel.state else {
+            return XCTFail("Expected success state")
+        }
+        XCTAssertEqual(copiedOriginal, .original)
+
+        viewModel.copyTranslation()
+        XCTAssertEqual(pasteboard.string(forType: .string), "你好")
+        guard case .success(_, _, _, _, let copiedTranslation) = viewModel.state else {
+            return XCTFail("Expected success state")
+        }
+        XCTAssertEqual(copiedTranslation, .translation)
     }
 
     private static func result(_ text: String) -> TranslationResult {

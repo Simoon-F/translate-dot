@@ -17,17 +17,22 @@ final class AppState {
     init(
         permissionManager: AccessibilityPermissionManager = AccessibilityPermissionManager(),
         selectedTextProvider: AXSelectedTextProvider = AXSelectedTextProvider(),
-        clipboardSelectedTextProvider: ClipboardSelectedTextProvider = ClipboardSelectedTextProvider()
+        clipboardSelectedTextProvider: ClipboardSelectedTextProvider = ClipboardSelectedTextProvider(),
+        settings: AppSettings = .shared
     ) {
         self.permissionManager = permissionManager
         self.selectedTextProvider = selectedTextProvider
         self.clipboardSelectedTextProvider = clipboardSelectedTextProvider
 
         let viewModel = TranslationViewModel()
-        let coordinator = TranslationCoordinator(viewModel: viewModel)
+        let coordinator = TranslationCoordinator(viewModel: viewModel, settings: settings)
         self.viewModel = viewModel
         self.coordinator = coordinator
-        self.panelController = TranslationPanelController(viewModel: viewModel, coordinator: coordinator)
+        self.panelController = TranslationPanelController(
+            viewModel: viewModel,
+            coordinator: coordinator,
+            settings: settings
+        )
 
         viewModel.onOpenAccessibilitySettings = { [weak permissionManager] in
             permissionManager?.openSystemSettings()

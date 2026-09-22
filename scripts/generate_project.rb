@@ -21,6 +21,8 @@ app_files = %w[
   App/AppDelegate.swift
   App/AppState.swift
   App/Localization.swift
+  Settings/AppSettings.swift
+  Settings/SettingsView.swift
   HotKey/HotKeyManager.swift
   Accessibility/AccessibilityPermissionManager.swift
   Accessibility/AXSelectedTextProvider.swift

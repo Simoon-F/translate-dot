@@ -3,11 +3,16 @@ import Combine
 import Foundation
 import os
 
+enum TranslationCopyTarget: Equatable {
+    case original
+    case translation
+}
+
 enum TranslationViewState: Equatable {
     case idle
     case loading(original: String)
     case preparing(original: String)
-    case success(original: String, translated: String, source: String, target: String, copied: Bool)
+    case success(original: String, translated: String, source: String, target: String, copied: TranslationCopyTarget?)
     case permissionRequired
     case noSelection(message: String)
     case unsupported(message: String)
@@ -23,8 +28,13 @@ final class TranslationViewModel: ObservableObject {
     var onDismiss: (() -> Void)?
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.simon.translatedot", category: "ViewModel")
+    private let pasteboard: NSPasteboard
     private var currentRequestID: UUID?
     private var activeTask: Task<Void, Never>?
+
+    init(pasteboard: NSPasteboard = .general) {
+        self.pasteboard = pasteboard
+    }
 
     func showLoading(for request: TranslationRequest) {
         activeTask?.cancel()
@@ -61,7 +71,7 @@ final class TranslationViewModel: ObservableObject {
                     translated: result.translatedText,
                     source: Self.displayName(result.sourceLanguage, fallback: sourceLabel),
                     target: Self.displayName(result.targetLanguage, fallback: targetLabel),
-                    copied: false
+                    copied: nil
                 )
             } catch is CancellationError {
                 self.logger.debug("Translation request cancelled")
@@ -98,7 +108,7 @@ final class TranslationViewModel: ObservableObject {
             translated: result.translatedText,
             source: Self.displayName(result.sourceLanguage, fallback: sourceLabel),
             target: Self.displayName(result.targetLanguage, fallback: targetLabel),
-            copied: false
+            copied: nil
         )
     }
 
@@ -136,12 +146,25 @@ final class TranslationViewModel: ObservableObject {
         state = .unsupported(message: message)
     }
 
+    func copyOriginal() {
+        copy(.original)
+    }
+
     func copyTranslation() {
-        guard case .success(let original, let translated, let source, let target, _) = state else { return }
-        let pasteboard = NSPasteboard.general
+        copy(.translation)
+    }
+
+    private func copy(_ target: TranslationCopyTarget) {
+        guard case .success(let original, let translated, let source, let targetLanguage, _) = state else { return }
         pasteboard.clearContents()
-        pasteboard.setString(translated, forType: .string)
-        state = .success(original: original, translated: translated, source: source, target: target, copied: true)
+        pasteboard.setString(target == .original ? original : translated, forType: .string)
+        state = .success(
+            original: original,
+            translated: translated,
+            source: source,
+            target: targetLanguage,
+            copied: target
+        )
     }
 
     func openAccessibilitySettings() {

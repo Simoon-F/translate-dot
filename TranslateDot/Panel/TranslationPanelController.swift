@@ -2,20 +2,23 @@ import AppKit
 import SwiftUI
 
 @MainActor
-final class TranslationPanelController {
-    private let panelSize = CGSize(width: 440, height: 350)
+final class TranslationPanelController: NSObject, NSWindowDelegate {
     private let panel: TranslationPanel
     private let positioner = PanelPositioner()
+    private let settings: AppSettings
     private var globalMouseMonitor: Any?
     private var localMouseMonitor: Any?
 
-    init(viewModel: TranslationViewModel, coordinator: TranslationCoordinator) {
+    init(viewModel: TranslationViewModel, coordinator: TranslationCoordinator, settings: AppSettings) {
+        self.settings = settings
+        let panelSize = settings.panelSize
         panel = TranslationPanel(
             contentRect: CGRect(origin: .zero, size: panelSize),
-            styleMask: [.borderless, .nonactivatingPanel],
+            styleMask: [.borderless, .nonactivatingPanel, .resizable],
             backing: .buffered,
             defer: false
         )
+        super.init()
         panel.isFloatingPanel = true
         panel.level = .floating
         panel.hidesOnDeactivate = false
@@ -26,6 +29,9 @@ final class TranslationPanelController {
         panel.animationBehavior = .utilityWindow
         panel.isReleasedWhenClosed = false
         panel.ignoresMouseEvents = false
+        panel.minSize = AppSettings.minimumPanelSize
+        panel.maxSize = AppSettings.maximumPanelSize
+        panel.delegate = self
 
         let root = AppleTranslationHost(coordinator: coordinator) {
             TranslationPanelView(viewModel: viewModel)
@@ -38,9 +44,13 @@ final class TranslationPanelController {
     }
 
     func show(anchor: CGRect?) {
+        let desiredSize = settings.panelSize
+        if panel.frame.size != desiredSize {
+            panel.setContentSize(desiredSize)
+        }
         let frames = NSScreen.screens.map(\.visibleFrame)
         let placement = positioner.placement(
-            panelSize: panelSize,
+            panelSize: panel.frame.size,
             selectionBounds: anchor,
             visibleScreenFrames: frames,
             mouseLocation: NSEvent.mouseLocation
@@ -51,6 +61,10 @@ final class TranslationPanelController {
 
     func hide() {
         panel.orderOut(nil)
+    }
+
+    func windowDidResize(_ notification: Notification) {
+        settings.updatePanelSize(panel.frame.size)
     }
 
     private func installOutsideClickMonitors() {
