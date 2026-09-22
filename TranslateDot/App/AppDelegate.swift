@@ -13,9 +13,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let state = AppState()
         appState = state
 
-        let hotKeys = HotKeyManager { [weak state] in
-            state?.translateSelection()
-        }
+        let hotKeys = HotKeyManager(
+            selectionAction: { [weak state] in state?.translateSelection() },
+            screenshotAction: { [weak state] in state?.translateScreenshot() }
+        )
         hotKeyManager = hotKeys
 
         if let message = hotKeys.registrationErrorMessage {
@@ -40,6 +41,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func translateSelection() {
         appState?.translateSelection()
+    }
+
+    func translateScreenshot() {
+        appState?.translateScreenshot()
     }
 
     func openAccessibilitySettings() {

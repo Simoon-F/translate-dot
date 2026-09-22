@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**Lightweight, fully local selection translation for macOS**
+**Lightweight, fully local selection and screenshot translation for macOS**
 
 Select text in any app, and the translation appears instantly in a floating panel next to your selection.
 
@@ -16,7 +16,7 @@ Select text in any app, and the translation appears instantly in a floating pane
 
 TranslateDot is a native macOS menu bar app. It reads the current text selection through the macOS Accessibility API, translates it on-device with the Apple Translation framework, and presents the result in a non-activating floating panel — without interrupting your workflow and without any cloud translation service.
 
-Core flow: **select text → press the hotkey → local translation → floating result**.
+Core flow: **select text or a screen region → press a hotkey → local recognition and translation → floating result**.
 
 <!-- Screenshot placeholder: after code signing and Accessibility approval, add light/dark mode screenshots under docs/screenshots/ and reference them here. -->
 
@@ -25,6 +25,7 @@ Core flow: **select text → press the hotkey → local translation → floating
 **Text capture and translation**
 
 - Global hotkey ⌥D (default; re-recordable in Settings)
+- Screenshot translation with ⌥S: drag over a screen region, run OCR locally with Apple Vision, then translate automatically
 - Reads the selected text and selection bounds of the focused element via the macOS Accessibility API; falls back to the frontmost application when system-level focus is unavailable, and supports controls that expose the selection on a parent element
 - When Accessibility data is unavailable, invokes the host app's Copy command to capture the selection and restores the original clipboard afterwards
 - On-device translation through the Apple Translation framework, including system language model preparation and download flows
@@ -56,7 +57,7 @@ Dependency: [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcut
 2. Select the `TranslateDot` scheme and the `My Mac` destination.
 3. Choose your Development Team under Target → Signing & Capabilities. The project intentionally disables App Sandbox so that directly distributed builds can access other apps' Accessibility elements.
 4. Click Run. After launch, TranslateDot only appears as a character-bubble icon in the menu bar.
-5. Select text in an app such as TextEdit and press **⌥D**.
+5. Select text in an app such as TextEdit and press **⌥D**. For images, PDFs, or video subtitles, press **⌥S** and drag over the content.
 6. On first use, follow the panel's prompt to enable TranslateDot under System Settings → Privacy & Security → Accessibility, then select text again and press **⌥D**.
 7. If the required language model is not installed, macOS presents the system download/authorization dialog; translation continues automatically once it completes.
 
@@ -76,24 +77,24 @@ xcodebuild -project TranslateDot.xcodeproj \
   CODE_SIGNING_ALLOWED=NO test
 ```
 
-## Why Accessibility Permission Is Needed
+## System Permissions
 
 macOS does not allow a regular app to read another app's current selection. TranslateDot uses `AXFocusedUIElement`, `AXSelectedText`, `AXSelectedTextRange`, and `AXBoundsForRange`, and only reads the selection and its position when the user explicitly presses the hotkey. If the permission is denied or revoked, the app shows guidance instead of crashing.
 
-TranslateDot never requests Screen Recording or Input Monitoring permission. Global hotkeys are provided through a Carbon hot key wrapper, not global keyboard event monitoring.
+Screenshot translation requires macOS Screen & System Audio Recording access. TranslateDot captures only the region you deliberately select after invoking the shortcut; it does not record continuously or request Input Monitoring access. Global hotkeys use a Carbon hot key wrapper rather than global keyboard event monitoring.
 
 ## Privacy
 
 - Translation runs entirely on-device through the Apple Translation framework and system language models; no cloud translation API or API key is involved
+- Screenshot OCR runs on-device through Apple Vision; screenshots are neither uploaded nor saved
 - No translation history, source text, or translations are stored
 - Logs contain only permission state, error types, state transitions, and request durations — never selected content
 - When direct capture fails, the host app's Copy command is invoked briefly and the clipboard is restored afterwards; source text never remains on the clipboard, and a translation is only placed on the clipboard after clicking "Copy Translation"
-- No OCR, screenshot, or screen recording capabilities are used
 
 ## Known Limitations
 
-- Some Electron apps, custom-drawn UIs, terminals, and PDF readers may not expose `AXSelectedText`; TranslateDot then reports that the current app does not support direct capture
-- Interfaces that forbid copying or expose no accessible text cannot be captured; text inside images requires OCR, and this version does not request Screen Recording permission
+- Some Electron apps, custom-drawn UIs, terminals, and PDF readers may not expose `AXSelectedText`; use ⌥S screenshot translation instead
+- OCR quality depends on image clarity, text size, rotation, and languages supported by the system Vision framework
 - Automatic language detection may be ambiguous for very short or mixed-language text; unrecognized input defaults to Simplified Chinese
 - Language model availability, first-use authorization, and download progress are managed by macOS
 - "Translate Selection" in the menu bar makes the menu the active responder; the global hotkey ⌥D is the most reliable capture entry point

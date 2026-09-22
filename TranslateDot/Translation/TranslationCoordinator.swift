@@ -55,6 +55,9 @@ final class TranslationCoordinator: ObservableObject {
 
     private func prepare(_ request: TranslationRequest) async {
         let route = router.route(text: request.text, preferences: settings.routingPreferences)
+        logger.info(
+            "Translation route source=\(route.source?.minimalIdentifier ?? "auto", privacy: .public) target=\(route.target.minimalIdentifier, privacy: .public)"
+        )
         do {
             let status: LanguageAvailability.Status
             if let source = route.source {

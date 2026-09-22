@@ -28,6 +28,10 @@ app_files = %w[
   Accessibility/AXSelectedTextProvider.swift
   Accessibility/ClipboardSelectedTextProvider.swift
   Accessibility/SelectedTextResult.swift
+  Capture/ScreenCapturePermissionManager.swift
+  Capture/ScreenCaptureProvider.swift
+  Capture/ScreenshotSelectionController.swift
+  Capture/VisionTextRecognizer.swift
   Translation/TranslationCoordinator.swift
   Translation/AppleTranslationHost.swift
   Translation/TranslationRequest.swift
@@ -44,6 +48,7 @@ test_files = %w[
   LanguageRouterTests.swift
   PanelPositionerTests.swift
   TranslationViewModelTests.swift
+  ScreenCaptureCoordinateConverterTests.swift
 ].freeze
 
 app_group = project.main_group.new_group('TranslateDot', 'TranslateDot')

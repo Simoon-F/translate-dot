@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**轻量、完全本地的 macOS 划词翻译工具**
+**轻量、完全本地的 macOS 划词与截图翻译工具**
 
 在任意应用中选中文本，译文即刻显示在选区旁的悬浮面板中。
 
@@ -16,7 +16,7 @@
 
 TranslateDot 是一款原生 macOS 菜单栏应用。它通过 Accessibility API 读取当前应用中的选中文本，调用 Apple Translation framework 在本机完成翻译，并以非激活式悬浮面板呈现结果——全程不打断当前工作流，不依赖任何云端翻译服务。
 
-核心链路：**选中文本 → 按快捷键 → 本地翻译 → 悬浮显示**。
+核心链路：**选中文本或框选屏幕区域 → 按快捷键 → 本地识别与翻译 → 悬浮显示**。
 
 <!-- 截图占位：完成签名并授权辅助功能后，将浅色/深色模式截图放入 docs/screenshots/ 并在此引用。 -->
 
@@ -25,6 +25,7 @@ TranslateDot 是一款原生 macOS 菜单栏应用。它通过 Accessibility API
 **取词与翻译**
 
 - 全局快捷键 ⌥D（默认值，可在设置中自定义录制）
+- 截图翻译快捷键 ⌥S：拖动框选屏幕区域，使用 Apple Vision 在本机 OCR 后自动翻译
 - 通过 macOS Accessibility API 读取焦点元素的选中文本与选区范围；系统级焦点不可用时按前台应用回退，并兼容部分将选区暴露在父元素上的控件
 - 辅助功能无法直接提供选区时，定向调用原应用的复制命令取词，读取后恢复原剪贴板
 - Apple Translation framework 本地翻译，支持系统语言模型的准备与下载流程
@@ -56,7 +57,7 @@ TranslateDot 是一款原生 macOS 菜单栏应用。它通过 Accessibility API
 2. 选择 `TranslateDot` scheme 与 `My Mac` 目标。
 3. 在 Target → Signing & Capabilities 中选择你的 Development Team。项目有意关闭 App Sandbox，以便直接分发版本访问其他应用的 Accessibility 元素。
 4. 点击 Run。应用启动后仅在菜单栏显示字符气泡图标。
-5. 在 TextEdit 等应用中选中文本并按 **⌥D**。
+5. 在 TextEdit 等应用中选中文本并按 **⌥D**；无法选中的图片、PDF 或视频字幕可按 **⌥S** 框选截图翻译。
 6. 首次使用时，按面板提示前往"系统设置 → 隐私与安全性 → 辅助功能"启用 TranslateDot，返回原应用后重新选择文本并再次按 **⌥D**。
 7. 若对应语言模型尚未安装，macOS 会弹出系统下载/授权界面，完成后翻译自动继续。
 
@@ -76,24 +77,24 @@ xcodebuild -project TranslateDot.xcodeproj \
   CODE_SIGNING_ALLOWED=NO test
 ```
 
-## 辅助功能权限说明
+## 系统权限说明
 
 macOS 不允许普通应用直接读取其他应用的当前选区。TranslateDot 使用 `AXFocusedUIElement`、`AXSelectedText`、`AXSelectedTextRange` 与 `AXBoundsForRange`，且仅在用户主动按下快捷键时读取当前选区及其位置；权限被拒绝或撤销时，应用会显示引导界面，不会崩溃。
 
-TranslateDot 不申请屏幕录制权限，也不申请输入监控权限。全局快捷键由 Carbon hot key 机制的封装库提供，而非全局键盘事件监听。
+截图翻译需要 macOS 的“屏幕与系统音频录制”权限。TranslateDot 仅在用户按下截图快捷键并主动框选后捕获该区域，不持续录屏，也不申请输入监控权限。全局快捷键由 Carbon hot key 机制的封装库提供，而非全局键盘事件监听。
 
 ## 隐私
 
 - 翻译由 Apple Translation framework 与系统本地语言模型完成，不接入云端翻译 API，无需 API Key
+- 截图 OCR 使用 Apple Vision 在本机完成，截图不会上传，也不会保存
 - 不保存翻译历史、原文或译文
 - 日志仅记录权限状态、错误类型、状态切换与请求耗时，不记录选择内容
 - 直接取词失败时短暂调用原应用的复制命令，读取后恢复原剪贴板，原文不会保留在剪贴板中；仅当点击"复制译文"后译文才会进入系统剪贴板
-- 不使用 OCR、截图或屏幕录制能力
 
 ## 已知限制
 
-- 部分 Electron 应用、自绘界面、终端与 PDF 阅读器可能不暴露 `AXSelectedText`，此时会提示"当前应用暂不支持直接取词"
-- 禁止复制或不提供可访问文本的界面无法取词；图片中的文字需要 OCR，当前版本不申请屏幕录制权限
+- 部分 Electron 应用、自绘界面、终端与 PDF 阅读器可能不暴露 `AXSelectedText`，可改用 ⌥S 截图翻译
+- OCR 效果受图片清晰度、字号、旋转角度与系统 Vision 支持语言影响
 - 自动语言识别对很短或混合语言的文本可能不确定；无法识别时默认翻译为简体中文
 - 语言模型的可用性、首次下载授权与下载进度由 macOS 管理
 - 菜单栏中的"Translate Selection"会使菜单成为当前交互对象，最可靠的取词入口是全局快捷键 ⌥D

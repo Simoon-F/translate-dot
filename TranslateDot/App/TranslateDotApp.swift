@@ -17,6 +17,16 @@ struct TranslateDotApp: App {
                 )
             }
 
+
+            Button {
+                appDelegate.translateScreenshot()
+            } label: {
+                Label(
+                    L10n.string("menu.translate_screenshot", defaultValue: "Screenshot Translation"),
+                    systemImage: "viewfinder"
+                )
+            }
+
             SettingsLink {
                 Label(
                     L10n.string("menu.settings", defaultValue: "Settings…"),

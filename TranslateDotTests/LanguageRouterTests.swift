@@ -35,6 +35,32 @@ final class LanguageRouterTests: XCTestCase {
         XCTAssertNil(route.source)
     }
 
+    func testLowConfidenceCommandLineTextFallsBackToEnglish() {
+        assertEnglishTechnicalText("npx changelogithub")
+        assertEnglishTechnicalText("npm install")
+    }
+
+    func testLowConfidenceProductPhraseFallsBackToEnglish() {
+        assertEnglishTechnicalText("Developer Program")
+    }
+
+    func testConfidentShortLatinLanguageIsPreserved() {
+        let route = router.route(text: "bonjour")
+        XCTAssertEqual(route.source?.languageCode?.identifier, "fr")
+        assertSimplifiedChinese(route.target)
+    }
+
+    func testFixedSourceLanguageOverridesTechnicalTextFallback() {
+        let preferences = LanguageRoutingPreferences(
+            sourceLanguageIdentifier: "de",
+            targetLanguageIdentifier: "zh-Hans",
+            automaticallyReverseLanguages: true,
+            reverseTargetLanguageIdentifier: "en"
+        )
+        let route = router.route(text: "Developer Program", preferences: preferences)
+        XCTAssertEqual(route.source?.languageCode?.identifier, "de")
+    }
+
     func testCustomFixedTargetLanguage() {
         let preferences = LanguageRoutingPreferences(
             sourceLanguageIdentifier: nil,
@@ -79,6 +105,12 @@ final class LanguageRouterTests: XCTestCase {
             XCTAssertEqual(route.target.languageCode?.identifier, target)
         }
         XCTAssertEqual(route.source, language)
+    }
+
+    private func assertEnglishTechnicalText(_ text: String) {
+        let route = router.route(text: text)
+        XCTAssertEqual(route.source?.languageCode?.identifier, "en")
+        assertSimplifiedChinese(route.target)
     }
 
     private func assertSimplifiedChinese(_ language: Locale.Language) {

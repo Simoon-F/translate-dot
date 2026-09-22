@@ -23,6 +23,7 @@ struct LanguageRoutingPreferences: Sendable, Equatable {
 
 struct LanguageRouter: Sendable {
     private static let chineseLanguageCodes: Set<String> = ["zh", "yue", "cmn", "wuu", "hak", "nan"]
+    private static let lowConfidenceThreshold = 0.60
 
     func route(
         text: String,
@@ -32,11 +33,25 @@ struct LanguageRouter: Sendable {
         if let identifier = preferences.sourceLanguageIdentifier {
             language = Locale.Language(identifier: identifier)
         } else {
-            let recognizer = NLLanguageRecognizer()
-            recognizer.processString(text)
-            language = recognizer.dominantLanguage.map { Locale.Language(identifier: $0.rawValue) }
+            language = detectLanguage(in: text)
         }
         return route(detectedLanguage: language, preferences: preferences)
+    }
+
+    private func detectLanguage(in text: String) -> Locale.Language? {
+        let recognizer = NLLanguageRecognizer()
+        recognizer.processString(text)
+
+        let hypotheses = recognizer.languageHypotheses(withMaximum: 3)
+        let strongest = hypotheses.max(by: { $0.value < $1.value })
+        if Self.isASCIILatinText(text),
+           strongest.map(\.value) ?? 0 < Self.lowConfidenceThreshold {
+            // Product names and command-line snippets are frequently misclassified as
+            // unrelated languages because they are short and absent from the language model.
+            return Locale.Language(identifier: "en")
+        }
+
+        return recognizer.dominantLanguage.map { Locale.Language(identifier: $0.rawValue) }
     }
 
     func route(
@@ -65,5 +80,13 @@ struct LanguageRouter: Sendable {
     static func sameLanguageFamily(_ lhs: Locale.Language, _ rhs: Locale.Language) -> Bool {
         if isChinese(lhs) && isChinese(rhs) { return true }
         return lhs.languageCode?.identifier == rhs.languageCode?.identifier
+    }
+
+    private static func isASCIILatinText(_ text: String) -> Bool {
+        let letters = text.unicodeScalars.filter { CharacterSet.letters.contains($0) }
+        guard !letters.isEmpty else { return false }
+        return letters.allSatisfy { scalar in
+            (65...90).contains(scalar.value) || (97...122).contains(scalar.value)
+        }
     }
 }

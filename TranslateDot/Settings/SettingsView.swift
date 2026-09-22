@@ -80,12 +80,16 @@ struct SettingsView: View {
                     L10n.string("settings.selection_shortcut", defaultValue: "Translate Selection"),
                     name: .translateSelection
                 )
+                KeyboardShortcuts.Recorder(
+                    L10n.string("settings.screenshot_shortcut", defaultValue: "Screenshot Translation"),
+                    name: .translateScreenshot
+                )
             } header: {
                 Text(L10n.string("settings.shortcuts", defaultValue: "Keyboard Shortcut"))
             } footer: {
                 Text(L10n.string(
                     "settings.shortcut_footer",
-                    defaultValue: "Select text in another app, then press this shortcut."
+                    defaultValue: "Use selection translation for selectable text, or drag an area with screenshot translation."
                 ))
             }
 

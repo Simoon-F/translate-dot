@@ -860,13 +860,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select text in another app, then press this shortcut."
+            "value" : "Use selection translation for selectable text, or drag an area with screenshot translation."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在其他应用中选择文本，然后按下此快捷键。"
+            "value" : "可选择的文字使用划词翻译，无法选择的内容可拖动区域进行截图翻译。"
           }
         }
       }
@@ -969,6 +969,214 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "拖动翻译窗口右下角即可调整大小，应用会自动记住尺寸。"
+          }
+        }
+      }
+    },
+    "capture.instruction" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag to select text · Esc to cancel"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拖动选择文字区域 · 按 Esc 取消"
+          }
+        }
+      }
+    },
+    "error.capture_display_unavailable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected display is no longer available. Try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选显示器已不可用，请重试。"
+          }
+        }
+      }
+    },
+    "error.capture_invalid_selection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The screenshot area is too small. Drag to select a larger area."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "截图区域太小，请拖动选择更大的区域。"
+          }
+        }
+      }
+    },
+    "error.screenshot_failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshot translation failed. Try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "截图翻译失败，请重试。"
+          }
+        }
+      }
+    },
+    "error.screenshot_no_text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No recognizable text was found in the selected area."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选区域中没有识别到文字。"
+          }
+        }
+      }
+    },
+    "hotkey.conflict_named" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Global shortcut %@ is used by another app. Change it in TranslateDot Settings."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全局快捷键 %@ 已被其他应用占用，请在 TranslateDot 设置中修改。"
+          }
+        }
+      }
+    },
+    "hotkey.registration_failed_named" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't register global shortcut %@. Restart the app."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法注册全局快捷键 %@，请重新启动应用。"
+          }
+        }
+      }
+    },
+    "menu.translate_screenshot" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshot Translation"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "截图翻译"
+          }
+        }
+      }
+    },
+    "panel.recognizing_screenshot" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recognizing screenshot…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在识别截图…"
+          }
+        }
+      }
+    },
+    "panel.recognizing_screenshot_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text recognition runs locally on this Mac."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文字识别完全在这台 Mac 上本地完成。"
+          }
+        }
+      }
+    },
+    "panel.screen_permission_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TranslateDot needs Screen & System Audio Recording access to capture only the area you select. You may need to reopen the app after granting access."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TranslateDot 需要“屏幕与系统音频录制”权限，只会截取你主动选择的区域。授权后可能需要重新打开应用。"
+          }
+        }
+      }
+    },
+    "panel.screen_permission_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen Recording Permission Required"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要屏幕录制权限"
+          }
+        }
+      }
+    },
+    "settings.screenshot_shortcut" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshot Translation"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "截图翻译"
           }
         }
       }

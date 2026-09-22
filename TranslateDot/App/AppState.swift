@@ -4,25 +4,40 @@ import os
 @MainActor
 final class AppState {
     let permissionManager: AccessibilityPermissionManager
+    let screenCapturePermissionManager: ScreenCapturePermissionManager
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.simon.translatedot", category: "Workflow")
     private let selectedTextProvider: AXSelectedTextProvider
     private let clipboardSelectedTextProvider: ClipboardSelectedTextProvider
+    private let screenshotSelectionController: ScreenshotSelectionController
+    private let screenCaptureProvider: ScreenCaptureProvider
+    private let textRecognizer: VisionTextRecognizer
+    private let settings: AppSettings
     private let viewModel: TranslationViewModel
     private let coordinator: TranslationCoordinator
     private let panelController: TranslationPanelController
     private var lastExternalApplicationPID: pid_t?
     private var selectionTask: Task<Void, Never>?
+    private var screenshotTask: Task<Void, Never>?
 
     init(
         permissionManager: AccessibilityPermissionManager = AccessibilityPermissionManager(),
+        screenCapturePermissionManager: ScreenCapturePermissionManager = ScreenCapturePermissionManager(),
         selectedTextProvider: AXSelectedTextProvider = AXSelectedTextProvider(),
         clipboardSelectedTextProvider: ClipboardSelectedTextProvider = ClipboardSelectedTextProvider(),
+        screenshotSelectionController: ScreenshotSelectionController = ScreenshotSelectionController(),
+        screenCaptureProvider: ScreenCaptureProvider = ScreenCaptureProvider(),
+        textRecognizer: VisionTextRecognizer = VisionTextRecognizer(),
         settings: AppSettings = .shared
     ) {
         self.permissionManager = permissionManager
+        self.screenCapturePermissionManager = screenCapturePermissionManager
         self.selectedTextProvider = selectedTextProvider
         self.clipboardSelectedTextProvider = clipboardSelectedTextProvider
+        self.screenshotSelectionController = screenshotSelectionController
+        self.screenCaptureProvider = screenCaptureProvider
+        self.textRecognizer = textRecognizer
+        self.settings = settings
 
         let viewModel = TranslationViewModel()
         let coordinator = TranslationCoordinator(viewModel: viewModel, settings: settings)
@@ -40,8 +55,35 @@ final class AppState {
         viewModel.onRetryAccessibility = { [weak self] in
             self?.retryAccessibilityPermission()
         }
+        viewModel.onOpenScreenCaptureSettings = { [weak screenCapturePermissionManager] in
+            screenCapturePermissionManager?.openSystemSettings()
+        }
+        viewModel.onRetryScreenCapture = { [weak self] in
+            self?.retryScreenCapturePermission()
+        }
         viewModel.onDismiss = { [weak panelController] in
             panelController?.hide()
+        }
+    }
+
+    func translateScreenshot() {
+        selectionTask?.cancel()
+        screenshotTask?.cancel()
+        screenshotSelectionController.cancel(notify: false)
+        panelController.hide()
+
+        guard screenCapturePermissionManager.requestAccessIfNeeded() else {
+            logger.info("Screenshot request requires Screen Recording permission")
+            viewModel.showScreenCapturePermissionRequired()
+            panelController.show(anchor: nil)
+            return
+        }
+
+        screenshotSelectionController.beginSelection { [weak self] selection in
+            guard let self, let selection else { return }
+            self.screenshotTask = Task { @MainActor [weak self] in
+                await self?.performScreenshotTranslation(selection)
+            }
         }
     }
 
@@ -100,6 +142,45 @@ final class AppState {
         }
     }
 
+    private func performScreenshotTranslation(_ selection: ScreenshotSelection) async {
+        viewModel.showRecognizingScreenshot()
+        panelController.show(anchor: selection.bounds)
+
+        do {
+            let image = try await screenCaptureProvider.capture(
+                selectionBounds: selection.bounds,
+                on: selection.screen
+            )
+            try Task.checkCancellation()
+            let sourceLanguage = settings.sourceLanguageIdentifier.isEmpty
+                ? nil
+                : settings.sourceLanguageIdentifier
+            let text = try await textRecognizer.recognizeText(
+                in: image,
+                sourceLanguageIdentifier: sourceLanguage
+            )
+            try Task.checkCancellation()
+
+            let request = TranslationRequest(text: text, selectionBounds: selection.bounds)
+            viewModel.showLoading(for: request)
+            coordinator.submit(request)
+        } catch is CancellationError {
+            logger.debug("Screenshot translation cancelled")
+        } catch let error as LocalizedError {
+            logger.error("Screenshot translation failed: \(String(describing: error), privacy: .public)")
+            viewModel.showFailure(error.errorDescription ?? L10n.string(
+                "error.screenshot_failed",
+                defaultValue: "Screenshot translation failed. Try again."
+            ))
+        } catch {
+            logger.error("Screenshot translation failed: \(String(describing: error), privacy: .public)")
+            viewModel.showFailure(L10n.string(
+                "error.screenshot_failed",
+                defaultValue: "Screenshot translation failed. Try again."
+            ))
+        }
+    }
+
     func showHotKeyFailure(_ message: String) {
         viewModel.showFailure(message)
         panelController.show(anchor: nil)
@@ -114,6 +195,14 @@ final class AppState {
         } else {
             viewModel.showPermissionRequired()
             monitorAccessibilityAuthorization()
+        }
+    }
+
+    private func retryScreenCapturePermission() {
+        if screenCapturePermissionManager.isAuthorized {
+            translateScreenshot()
+        } else {
+            viewModel.showScreenCapturePermissionRequired()
         }
     }
 

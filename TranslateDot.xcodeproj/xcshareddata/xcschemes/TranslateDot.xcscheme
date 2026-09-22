@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2E87FA4A17C0AA5DD01CD556"
+               BlueprintIdentifier = "B2BD389DBA9274A7615156A0"
                BuildableName = "TranslateDot.app"
                BlueprintName = "TranslateDot"
                ReferencedContainer = "container:TranslateDot.xcodeproj">
@@ -30,7 +30,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2E87FA4A17C0AA5DD01CD556"
+            BlueprintIdentifier = "B2BD389DBA9274A7615156A0"
             BuildableName = "TranslateDot.app"
             BlueprintName = "TranslateDot"
             ReferencedContainer = "container:TranslateDot.xcodeproj">
@@ -41,7 +41,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E610E22F1581F0923A6FBF6C"
+               BlueprintIdentifier = "D72D963C82505FC9C2B10AE9"
                BuildableName = "TranslateDotTests.xctest"
                BlueprintName = "TranslateDotTests"
                ReferencedContainer = "container:TranslateDot.xcodeproj">
@@ -63,7 +63,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2E87FA4A17C0AA5DD01CD556"
+            BlueprintIdentifier = "B2BD389DBA9274A7615156A0"
             BuildableName = "TranslateDot.app"
             BlueprintName = "TranslateDot"
             ReferencedContainer = "container:TranslateDot.xcodeproj">
@@ -80,7 +80,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2E87FA4A17C0AA5DD01CD556"
+            BlueprintIdentifier = "B2BD389DBA9274A7615156A0"
             BuildableName = "TranslateDot.app"
             BlueprintName = "TranslateDot"
             ReferencedContainer = "container:TranslateDot.xcodeproj">

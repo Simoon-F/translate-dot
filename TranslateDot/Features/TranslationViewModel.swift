@@ -10,10 +10,12 @@ enum TranslationCopyTarget: Equatable {
 
 enum TranslationViewState: Equatable {
     case idle
+    case recognizingScreenshot
     case loading(original: String)
     case preparing(original: String)
     case success(original: String, translated: String, source: String, target: String, copied: TranslationCopyTarget?)
     case permissionRequired
+    case screenCapturePermissionRequired
     case noSelection(message: String)
     case unsupported(message: String)
     case failure(message: String)
@@ -25,6 +27,8 @@ final class TranslationViewModel: ObservableObject {
 
     var onOpenAccessibilitySettings: (() -> Void)?
     var onRetryAccessibility: (() -> Void)?
+    var onOpenScreenCaptureSettings: (() -> Void)?
+    var onRetryScreenCapture: (() -> Void)?
     var onDismiss: (() -> Void)?
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.simon.translatedot", category: "ViewModel")
@@ -41,6 +45,12 @@ final class TranslationViewModel: ObservableObject {
         currentRequestID = request.id
         state = .loading(original: request.text)
         logger.debug("State changed to loading")
+    }
+
+    func showRecognizingScreenshot() {
+        cancelAndResetRequest()
+        state = .recognizingScreenshot
+        logger.debug("State changed to screenshot recognition")
     }
 
     func showPreparing(for request: TranslationRequest) {
@@ -117,6 +127,11 @@ final class TranslationViewModel: ObservableObject {
         state = .permissionRequired
     }
 
+    func showScreenCapturePermissionRequired() {
+        cancelAndResetRequest()
+        state = .screenCapturePermissionRequired
+    }
+
     func showSelectionError(_ error: SelectedTextError) {
         cancelAndResetRequest()
         switch error {
@@ -173,6 +188,14 @@ final class TranslationViewModel: ObservableObject {
 
     func retryAccessibility() {
         onRetryAccessibility?()
+    }
+
+    func openScreenCaptureSettings() {
+        onOpenScreenCaptureSettings?()
+    }
+
+    func retryScreenCapture() {
+        onRetryScreenCapture?()
     }
 
     func dismiss() {

@@ -65,6 +65,23 @@ struct TranslationPanelView: View {
                 )
             )
 
+        case .recognizingScreenshot:
+            VStack(alignment: .leading, spacing: 14) {
+                Label(
+                    L10n.string("panel.recognizing_screenshot", defaultValue: "Recognizing screenshot…"),
+                    systemImage: "viewfinder"
+                )
+                .font(.title3.weight(.semibold))
+                HStack(spacing: 9) {
+                    ProgressView().controlSize(.small)
+                    Text(L10n.string(
+                        "panel.recognizing_screenshot_message",
+                        defaultValue: "Text recognition runs locally on this Mac."
+                    ))
+                    .foregroundStyle(.secondary)
+                }
+            }
+
         case .loading(let original):
             translationProgress(
                 original: original,
@@ -82,6 +99,9 @@ struct TranslationPanelView: View {
 
         case .permissionRequired:
             permissionView
+
+        case .screenCapturePermissionRequired:
+            screenCapturePermissionView
 
         case .noSelection(let message):
             messageView(
@@ -206,6 +226,32 @@ struct TranslationPanelView: View {
                     .buttonStyle(.borderedProminent)
                 Button(L10n.string("panel.check_again", defaultValue: "Check Again")) {
                     viewModel.retryAccessibility()
+                }
+                    .buttonStyle(.bordered)
+            }
+        }
+    }
+
+    private var screenCapturePermissionView: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label(
+                L10n.string("panel.screen_permission_title", defaultValue: "Screen Recording Permission Required"),
+                systemImage: "rectangle.dashed.badge.record"
+            )
+                .font(.title3.weight(.semibold))
+            Text(L10n.string(
+                "panel.screen_permission_message",
+                defaultValue: "TranslateDot needs Screen & System Audio Recording access to capture only the area you select. You may need to reopen the app after granting access."
+            ))
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            HStack {
+                Button(L10n.string("panel.open_settings", defaultValue: "Open System Settings")) {
+                    viewModel.openScreenCaptureSettings()
+                }
+                    .buttonStyle(.borderedProminent)
+                Button(L10n.string("panel.check_again", defaultValue: "Check Again")) {
+                    viewModel.retryScreenCapture()
                 }
                     .buttonStyle(.bordered)
             }
