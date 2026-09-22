@@ -15,6 +15,14 @@ struct SettingsView: View {
                     )
                 }
 
+            LanguageModelsView(settings: settings)
+                .tabItem {
+                    Label(
+                        L10n.string("settings.models_tab", defaultValue: "Language Models"),
+                        systemImage: "arrow.down.circle"
+                    )
+                }
+
             generalSettings
                 .tabItem {
                     Label(
@@ -23,7 +31,7 @@ struct SettingsView: View {
                     )
                 }
         }
-        .frame(width: 620, height: 430)
+        .frame(width: 680, height: 520)
         .background(SettingsWindowActivationView())
     }
 

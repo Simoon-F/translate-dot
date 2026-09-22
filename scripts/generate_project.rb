@@ -23,6 +23,7 @@ app_files = %w[
   App/Localization.swift
   Settings/AppSettings.swift
   Settings/SettingsView.swift
+  Settings/LanguageModelsView.swift
   HotKey/HotKeyManager.swift
   Accessibility/AccessibilityPermissionManager.swift
   Accessibility/AXSelectedTextProvider.swift

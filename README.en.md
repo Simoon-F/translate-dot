@@ -29,6 +29,7 @@ Core flow: **select text or a screen region → press a hotkey → local recogni
 - Reads the selected text and selection bounds of the focused element via the macOS Accessibility API; falls back to the frontmost application when system-level focus is unavailable, and supports controls that expose the selection on a parent element
 - When Accessibility data is unavailable, invokes the host app's Copy command to capture the selection and restores the original clipboard afterwards
 - On-device translation through the Apple Translation framework, including system language model preparation and download flows
+- A Language Models settings page shows installation status, prepares English–Chinese models in advance, and links to system model management
 - Automatic source-language detection: Chinese (Simplified/Traditional, Cantonese) is translated to English, other languages to Simplified Chinese; source language, default target language, and automatic reverse target are all customizable, with the language list provided by the system's Apple Translation
 
 **UI and experience**
