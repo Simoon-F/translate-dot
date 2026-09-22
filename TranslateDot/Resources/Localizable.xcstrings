@@ -650,6 +650,38 @@
         }
       }
     },
+    "panel.edit_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit the original, then translate again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑原文后可重新翻译。"
+          }
+        }
+      }
+    },
+    "panel.retranslate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate Again"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新翻译"
+          }
+        }
+      }
+    },
     "panel.translation" : {
       "extractionState" : "stale",
       "localizations" : {

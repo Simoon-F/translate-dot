@@ -42,6 +42,7 @@ app_files = %w[
   Panel/TranslationPanelController.swift
   Panel/PanelPositioner.swift
   Panel/TranslationPanelView.swift
+  Panel/TranslationSuccessView.swift
   Features/TranslationViewModel.swift
 ].freeze
 

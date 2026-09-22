@@ -114,6 +114,84 @@ final class TranslationViewModelTests: XCTestCase {
         XCTAssertEqual(copiedTranslation, .translation)
     }
 
+    func testEditedOriginalCanBeRetranslatedAndCopied() {
+        let pasteboard = NSPasteboard(name: .init("TranslateDotTests.\(UUID().uuidString)"))
+        let viewModel = TranslationViewModel(pasteboard: pasteboard)
+        let request = TranslationRequest(text: "Hello")
+        viewModel.showLoading(for: request)
+        viewModel.showSuccess(
+            Self.result("你好"),
+            for: request,
+            sourceLabel: "English",
+            targetLabel: "Chinese"
+        )
+
+        var submittedText: String?
+        viewModel.onRetranslate = { submittedText = $0 }
+        viewModel.updateDraftOriginal("  Hello, world  ")
+
+        XCTAssertTrue(viewModel.canRetranslate)
+        viewModel.copyOriginal()
+        XCTAssertEqual(pasteboard.string(forType: .string), "  Hello, world  ")
+        viewModel.retranslateDraft()
+        XCTAssertEqual(submittedText, "Hello, world")
+    }
+
+    func testUnchangedOrOversizedOriginalCannotBeRetranslated() {
+        let viewModel = TranslationViewModel()
+        let request = TranslationRequest(text: "Hello")
+        viewModel.showLoading(for: request)
+        viewModel.showSuccess(
+            Self.result("你好"),
+            for: request,
+            sourceLabel: "English",
+            targetLabel: "Chinese"
+        )
+        XCTAssertFalse(viewModel.canRetranslate)
+
+        viewModel.updateDraftOriginal(String(
+            repeating: "a",
+            count: TranslationViewModel.maximumEditableCharacterCount + 1
+        ))
+        XCTAssertTrue(viewModel.isDraftTooLong)
+        XCTAssertFalse(viewModel.canRetranslate)
+    }
+
+    func testRetranslationKeepsCurrentResultVisibleUntilReplacementArrives() {
+        let viewModel = TranslationViewModel()
+        let firstRequest = TranslationRequest(text: "Hello")
+        viewModel.showLoading(for: firstRequest)
+        viewModel.showSuccess(
+            Self.result("你好"),
+            for: firstRequest,
+            sourceLabel: "English",
+            targetLabel: "Chinese"
+        )
+        let visibleState = viewModel.state
+
+        let editedRequest = TranslationRequest(text: "Hello, world")
+        viewModel.beginRetranslation(for: editedRequest)
+        XCTAssertTrue(viewModel.isRetranslating)
+        XCTAssertEqual(viewModel.state, visibleState)
+        XCTAssertFalse(viewModel.canRetranslate)
+
+        viewModel.showPreparing(for: editedRequest)
+        XCTAssertEqual(viewModel.state, visibleState)
+
+        viewModel.showSuccess(
+            Self.result("你好，世界"),
+            for: editedRequest,
+            sourceLabel: "English",
+            targetLabel: "Chinese"
+        )
+        XCTAssertFalse(viewModel.isRetranslating)
+        guard case .success(let original, let translated, _, _, _) = viewModel.state else {
+            return XCTFail("Expected replacement result")
+        }
+        XCTAssertEqual(original, "Hello, world")
+        XCTAssertEqual(translated, "你好，世界")
+    }
+
     private static func result(_ text: String) -> TranslationResult {
         TranslationResult(
             translatedText: text,

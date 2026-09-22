@@ -61,6 +61,9 @@ final class AppState {
         viewModel.onRetryScreenCapture = { [weak self] in
             self?.retryScreenCapturePermission()
         }
+        viewModel.onRetranslate = { [weak self] text in
+            self?.translateEditedText(text)
+        }
         viewModel.onDismiss = { [weak panelController] in
             panelController?.hide()
         }
@@ -179,6 +182,12 @@ final class AppState {
                 defaultValue: "Screenshot translation failed. Try again."
             ))
         }
+    }
+
+    private func translateEditedText(_ text: String) {
+        let request = TranslationRequest(text: text)
+        viewModel.beginRetranslation(for: request)
+        coordinator.submit(request)
     }
 
     func showHotKeyFailure(_ message: String) {

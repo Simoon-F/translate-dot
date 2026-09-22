@@ -20,6 +20,7 @@ final class TranslationPanelController: NSObject, NSWindowDelegate {
         )
         super.init()
         panel.isFloatingPanel = true
+        panel.becomesKeyOnlyIfNeeded = true
         panel.level = .floating
         panel.hidesOnDeactivate = false
         panel.isOpaque = false
@@ -27,6 +28,7 @@ final class TranslationPanelController: NSObject, NSWindowDelegate {
         panel.hasShadow = true
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
         panel.animationBehavior = .utilityWindow
+        panel.isMovableByWindowBackground = true
         panel.isReleasedWhenClosed = false
         panel.ignoresMouseEvents = false
         panel.minSize = AppSettings.minimumPanelSize

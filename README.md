@@ -38,7 +38,7 @@ TranslateDot 是一款原生 macOS 菜单栏应用。它通过 Accessibility API
 - 非激活式 `NSPanel`，支持多显示器、Space 与全屏应用
 - 新请求自动取消旧请求，过期结果不会覆盖当前结果
 - 翻译窗口默认 640 × 500，可拖拽右下角调整大小并自动记忆
-- 原文与译文均可单独复制
+- 原文可直接编辑并重新翻译（支持 ⌘Return），原文与译文均可单独复制
 - 界面完整支持简体中文与英文，跟随 macOS 应用语言设置
 
 ## 系统要求
@@ -137,6 +137,5 @@ tccutil reset Accessibility com.simon.translatedot
 
 ## Roadmap
 
-- [ ] 可选的屏幕 OCR 取词
 - [ ] 登录时启动
 - [ ] Developer ID 签名、公证与直接分发流程

@@ -7,16 +7,18 @@ struct TranslationPanelView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
-            Divider().opacity(0.65)
+            Divider().opacity(0.45)
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .padding(16)
         }
+        .font(.system(size: 12))
         .frame(
             minWidth: AppSettings.minimumPanelSize.width,
             minHeight: AppSettings.minimumPanelSize.height
         )
-        .background(.regularMaterial)
+        .background {
+            Rectangle().fill(.regularMaterial)
+        }
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -31,17 +33,23 @@ struct TranslationPanelView: View {
     }
 
     private var header: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "character.bubble.fill")
-                .foregroundStyle(.tint)
-            Text("TranslateDot")
-                .font(.headline)
-            Spacer()
+        ZStack(alignment: .trailing) {
+            PanelDragRegion()
+            HStack(spacing: 8) {
+                Image(systemName: "character.bubble.fill")
+                    .foregroundStyle(.tint)
+                Text("TranslateDot")
+                    .font(.system(size: 12, weight: .semibold))
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .allowsHitTesting(false)
+
             PanelCloseButton(action: viewModel.dismiss)
+                .padding(.trailing, 12)
         }
-        .padding(.horizontal, 16)
-        .frame(height: 45)
-        .background(PanelDragRegion())
+        .frame(height: 48)
+        .background(.thinMaterial.opacity(0.45))
     }
 
     @ViewBuilder
@@ -63,28 +71,32 @@ struct TranslationPanelView: View {
                     L10n.string("panel.recognizing_screenshot", defaultValue: "Recognizing screenshot…"),
                     systemImage: "viewfinder"
                 )
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 14, weight: .semibold))
                 HStack(spacing: 9) {
                     ProgressView().controlSize(.small)
                     Text(L10n.string(
                         "panel.recognizing_screenshot_message",
                         defaultValue: "Text recognition runs locally on this Mac."
                     ))
+                    .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                 }
             }
+            .padding(20)
 
         case .loading(let original):
             translationProgress(
                 original: original,
                 title: L10n.string("panel.checking_language", defaultValue: "Checking language…")
             )
+            .padding(20)
 
         case .preparing(let original):
             translationProgress(
                 original: original,
                 title: L10n.string("panel.preparing_model", defaultValue: "Preparing language model…")
             )
+            .padding(20)
 
         case .success(let original, let translated, let source, let target, let copied):
             successView(original: original, translated: translated, source: source, target: target, copied: copied)
@@ -119,11 +131,28 @@ struct TranslationPanelView: View {
     }
 
     private func translationProgress(original: String, title: String) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            sourceSection(original)
-            HStack(spacing: 9) {
-                ProgressView().controlSize(.small)
-                Text(title).foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 12) {
+            PanelCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    Label(L10n.string("panel.original", defaultValue: "Original"), systemImage: "text.alignleft")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                    ScrollView {
+                        Text(original)
+                            .font(.system(size: 13))
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+            }
+            PanelCard(tinted: true) {
+                HStack(spacing: 10) {
+                    ProgressView().controlSize(.small)
+                    Text(title)
+                        .font(.system(size: 12, weight: .medium))
+                    Spacer()
+                }
             }
         }
     }
@@ -135,67 +164,13 @@ struct TranslationPanelView: View {
         target: String,
         copied: TranslationCopyTarget?
     ) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("\(source) → \(target)")
-                .font(.caption.weight(.medium))
-                .foregroundStyle(.secondary)
-
-            VSplitView {
-                textSection(
-                    title: L10n.string("panel.original", defaultValue: "Original"),
-                    text: original,
-                    isOriginal: true,
-                    copied: copied == .original,
-                    copyTitle: L10n.string("panel.copy_original", defaultValue: "Copy Original"),
-                    action: viewModel.copyOriginal
-                )
-                .frame(minHeight: 110)
-
-                textSection(
-                    title: L10n.string("panel.translation", defaultValue: "Translation"),
-                    text: translated,
-                    isOriginal: false,
-                    copied: copied == .translation,
-                    copyTitle: L10n.string("panel.copy_translation", defaultValue: "Copy Translation"),
-                    action: viewModel.copyTranslation
-                )
-                .frame(minHeight: 140)
-            }
-        }
-    }
-
-    private func textSection(
-        title: String,
-        text: String,
-        isOriginal: Bool,
-        copied: Bool,
-        copyTitle: String,
-        action: @escaping () -> Void
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(title)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Button(action: action) {
-                    Label(
-                        copied ? L10n.string("panel.copied", defaultValue: "Copied") : copyTitle,
-                        systemImage: copied ? "checkmark" : "doc.on.doc"
-                    )
-                }
-                .buttonStyle(.borderless)
-            }
-            ScrollView {
-                Text(text)
-                    .font(isOriginal ? .callout : .body)
-                    .foregroundStyle(isOriginal ? .secondary : .primary)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.trailing, 10)
-            }
-        }
-        .padding(.vertical, 6)
+        TranslationSuccessContent(
+            viewModel: viewModel,
+            translated: translated,
+            source: source,
+            target: target,
+            copied: copied
+        )
     }
 
     private var permissionView: some View {
@@ -204,11 +179,12 @@ struct TranslationPanelView: View {
                 L10n.string("panel.permission_title", defaultValue: "Accessibility Permission Required"),
                 systemImage: "hand.raised.fill"
             )
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 14, weight: .semibold))
             Text(L10n.string(
                 "panel.permission_message",
                 defaultValue: "TranslateDot only uses this permission to read text you explicitly select. After granting access, the app checks automatically."
             ))
+                .font(.system(size: 12))
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             HStack {
@@ -222,6 +198,7 @@ struct TranslationPanelView: View {
                     .buttonStyle(.bordered)
             }
         }
+        .padding(20)
     }
 
     private var screenCapturePermissionView: some View {
@@ -230,11 +207,12 @@ struct TranslationPanelView: View {
                 L10n.string("panel.screen_permission_title", defaultValue: "Screen Recording Permission Required"),
                 systemImage: "rectangle.dashed.badge.record"
             )
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 14, weight: .semibold))
             Text(L10n.string(
                 "panel.screen_permission_message",
                 defaultValue: "TranslateDot needs Screen & System Audio Recording access to capture only the area you select. You may need to reopen the app after granting access."
             ))
+                .font(.system(size: 12))
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             HStack {
@@ -248,27 +226,21 @@ struct TranslationPanelView: View {
                     .buttonStyle(.bordered)
             }
         }
-    }
-
-    private func sourceSection(_ original: String) -> some View {
-        ScrollView {
-            Text(original)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .frame(maxHeight: 205)
+        .padding(20)
     }
 
     private func messageView(icon: String, title: String, message: String) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label(title, systemImage: icon)
-                .font(.title3.weight(.semibold))
-            Text(message)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+        PanelCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Label(title, systemImage: icon)
+                    .font(.system(size: 14, weight: .semibold))
+                Text(message)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
+        .padding(20)
     }
 }
 

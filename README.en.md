@@ -38,7 +38,7 @@ Core flow: **select text or a screen region → press a hotkey → local recogni
 - Non-activating `NSPanel` with multi-display, Space, and full-screen support
 - New requests cancel stale ones; outdated results never overwrite current results
 - Translation window defaults to 640 × 500, resizable from the bottom-right corner, with the size remembered
-- Source text and translation can be copied independently
+- Source text can be edited and translated again (⌘Return); source and translation can also be copied independently
 - Fully localized in Simplified Chinese and English, following the app language setting in macOS
 
 ## Requirements
@@ -137,6 +137,5 @@ The app requests the system authorization prompt at most once per launch and re-
 
 ## Roadmap
 
-- [ ] Optional on-screen OCR text capture
 - [ ] Launch at login
 - [ ] Developer ID signing, notarization, and direct distribution
