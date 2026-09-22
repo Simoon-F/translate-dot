@@ -18,7 +18,9 @@ struct AppleTranslationHost<Content: View>: View {
 
                 do {
                     try Task.checkCancellation()
-                    try await session.prepareTranslation()
+                    if work.needsPreparation {
+                        try await session.prepareTranslation()
+                    }
                     try Task.checkCancellation()
                     let response = try await session.translate(work.request.text)
                     try Task.checkCancellation()

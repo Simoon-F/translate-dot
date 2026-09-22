@@ -44,6 +44,13 @@ final class LanguageRouterTests: XCTestCase {
         assertEnglishTechnicalText("Developer Program")
     }
 
+    func testAmbiguousShortChineseTextUsesPreferredSimplifiedModel() {
+        let route = router.route(text: "原因")
+        XCTAssertEqual(route.source?.languageCode?.identifier, "zh")
+        XCTAssertEqual(route.source?.script?.identifier, "Hans")
+        XCTAssertEqual(route.target.languageCode?.identifier, "en")
+    }
+
     func testConfidentShortLatinLanguageIsPreserved() {
         let route = router.route(text: "bonjour")
         XCTAssertEqual(route.source?.languageCode?.identifier, "fr")
@@ -94,6 +101,35 @@ final class LanguageRouterTests: XCTestCase {
             Locale.Language(identifier: "zh-Hant"),
             Locale.Language(identifier: "zh-Hans")
         ))
+    }
+
+    func testAutoDetectedChineseUsesPreferredSimplifiedVariant() {
+        let normalized = LanguageRouter.normalizedAutoDetectedLanguage(
+            Locale.Language(identifier: "yue"),
+            preferredTarget: Locale.Language(identifier: "zh-Hans")
+        )
+        XCTAssertEqual(normalized?.languageCode?.identifier, "zh")
+        XCTAssertEqual(normalized?.script?.identifier, "Hans")
+    }
+
+    func testAutoDetectedChineseUsesPreferredTraditionalVariant() {
+        let normalized = LanguageRouter.normalizedAutoDetectedLanguage(
+            Locale.Language(identifier: "zh-Hans"),
+            preferredTarget: Locale.Language(identifier: "zh-Hant")
+        )
+        XCTAssertEqual(normalized?.languageCode?.identifier, "zh")
+        XCTAssertEqual(normalized?.script?.identifier, "Hant")
+    }
+
+    func testSupportedChineseIdentifiersRemainVisibleAsSimplifiedAndTraditional() {
+        XCTAssertEqual(
+            LanguageRouter.canonicalTranslationIdentifier(for: Locale.Language(identifier: "zh")),
+            "zh-Hans"
+        )
+        XCTAssertEqual(
+            LanguageRouter.canonicalTranslationIdentifier(for: Locale.Language(identifier: "zh-TW")),
+            "zh-Hant"
+        )
     }
 
     private func assertRoute(_ source: String, target: String) {

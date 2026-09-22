@@ -33,7 +33,10 @@ struct LanguageRouter: Sendable {
         if let identifier = preferences.sourceLanguageIdentifier {
             language = Locale.Language(identifier: identifier)
         } else {
-            language = detectLanguage(in: text)
+            language = Self.normalizedAutoDetectedLanguage(
+                detectLanguage(in: text),
+                preferredTarget: Locale.Language(identifier: preferences.targetLanguageIdentifier)
+            )
         }
         return route(detectedLanguage: language, preferences: preferences)
     }
@@ -80,6 +83,29 @@ struct LanguageRouter: Sendable {
     static func sameLanguageFamily(_ lhs: Locale.Language, _ rhs: Locale.Language) -> Bool {
         if isChinese(lhs) && isChinese(rhs) { return true }
         return lhs.languageCode?.identifier == rhs.languageCode?.identifier
+    }
+
+    static func normalizedAutoDetectedLanguage(
+        _ detectedLanguage: Locale.Language?,
+        preferredTarget: Locale.Language
+    ) -> Locale.Language? {
+        guard let detectedLanguage,
+              isChinese(detectedLanguage),
+              isChinese(preferredTarget) else {
+            return detectedLanguage
+        }
+
+        // Very short Chinese text is frequently classified as Traditional Chinese or Cantonese
+        // even when its characters are shared with Simplified Chinese. Reuse the user's chosen
+        // Chinese variant so the same installed model works consistently in both directions.
+        return Locale.Language(identifier: canonicalTranslationIdentifier(for: preferredTarget))
+    }
+
+    static func canonicalTranslationIdentifier(for language: Locale.Language) -> String {
+        guard language.languageCode?.identifier == "zh" else {
+            return language.minimalIdentifier
+        }
+        return language.script?.identifier == "Hant" ? "zh-Hant" : "zh-Hans"
     }
 
     private static func isASCIILatinText(_ text: String) -> Bool {

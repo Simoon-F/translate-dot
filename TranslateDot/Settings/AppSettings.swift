@@ -91,7 +91,7 @@ final class AppSettings: ObservableObject {
         Task { @MainActor [weak self] in
             let languages = await LanguageAvailability().supportedLanguages
             guard let self else { return }
-            let identifiers = languages.map(\.minimalIdentifier)
+            let identifiers = languages.map(LanguageRouter.canonicalTranslationIdentifier(for:))
             let requiredIdentifiers = [
                 self.targetLanguageIdentifier,
                 self.reverseTargetLanguageIdentifier,

@@ -1,3 +1,5 @@
+import AVFoundation
+import os
 import SwiftUI
 
 struct TranslationSuccessContent: View {
@@ -6,19 +8,28 @@ struct TranslationSuccessContent: View {
     let source: String
     let target: String
     let copied: TranslationCopyTarget?
+    @StateObject private var speechController = TextSpeechController()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             LanguageRouteBar(source: source, target: target)
             Divider().opacity(0.45)
-            OriginalEditorCard(viewModel: viewModel, copied: copied == .original)
+            OriginalEditorCard(
+                viewModel: viewModel,
+                copied: copied == .original,
+                speechController: speechController
+            )
             Divider().opacity(0.45)
             TranslationResultCard(
                 viewModel: viewModel,
                 translated: translated,
-                copied: copied == .translation
+                copied: copied == .translation,
+                speechController: speechController
             )
             .frame(minHeight: 120, maxHeight: .infinity)
+        }
+        .onDisappear {
+            speechController.stop()
         }
     }
 }
@@ -52,6 +63,7 @@ private struct LanguageRouteBar: View {
 private struct OriginalEditorCard: View {
     @ObservedObject var viewModel: TranslationViewModel
     let copied: Bool
+    @ObservedObject var speechController: TextSpeechController
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
@@ -68,6 +80,20 @@ private struct OriginalEditorCard: View {
             Label(L10n.string("panel.original", defaultValue: "Original"), systemImage: "pencil.line")
                 .font(.system(size: 12, weight: .semibold))
             Spacer()
+            SpeechActionButton(
+                title: speechController.activeTarget == .original
+                    ? L10n.string("panel.stop_reading", defaultValue: "Stop Reading")
+                    : L10n.string("panel.read_original", defaultValue: "Read Original"),
+                isSpeaking: speechController.activeTarget == .original,
+                isDisabled: viewModel.draftOriginal.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                action: {
+                    speechController.toggle(
+                        target: .original,
+                        text: viewModel.draftOriginal,
+                        languageIdentifier: viewModel.sourceLanguageIdentifier
+                    )
+                }
+            )
             PanelActionButton(
                 title: copied
                     ? L10n.string("panel.copied", defaultValue: "Copied")
@@ -142,6 +168,7 @@ private struct TranslationResultCard: View {
     @ObservedObject var viewModel: TranslationViewModel
     let translated: String
     let copied: Bool
+    @ObservedObject var speechController: TextSpeechController
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -152,6 +179,20 @@ private struct TranslationResultCard: View {
                 )
                 .font(.system(size: 12, weight: .semibold))
                 Spacer()
+                SpeechActionButton(
+                    title: speechController.activeTarget == .translation
+                        ? L10n.string("panel.stop_reading", defaultValue: "Stop Reading")
+                        : L10n.string("panel.read_translation", defaultValue: "Read Translation"),
+                    isSpeaking: speechController.activeTarget == .translation,
+                    isDisabled: translated.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                    action: {
+                        speechController.toggle(
+                            target: .translation,
+                            text: translated,
+                            languageIdentifier: viewModel.targetLanguageIdentifier
+                        )
+                    }
+                )
                 PanelActionButton(
                     title: copied
                         ? L10n.string("panel.copied", defaultValue: "Copied")
@@ -250,5 +291,212 @@ private struct PanelActionButton: View {
                 isHovering = hovering
             }
         }
+    }
+}
+
+private enum SpeechTarget: Equatable {
+    case original
+    case translation
+}
+
+@MainActor
+private final class TextSpeechController: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
+    @Published private(set) var activeTarget: SpeechTarget?
+
+    private let synthesizer = AVSpeechSynthesizer()
+    private var mandarinProcess: Process?
+    private var mandarinProcessIdentifier: UUID?
+    private let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.simon.translatedot",
+        category: "Speech"
+    )
+    private var activeUtteranceIdentifier: ObjectIdentifier?
+
+    override init() {
+        super.init()
+        synthesizer.delegate = self
+    }
+
+    func toggle(target: SpeechTarget, text: String, languageIdentifier: String?) {
+        if activeTarget == target {
+            stop()
+            return
+        }
+
+        stop()
+
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty else { return }
+
+        if SpeechVoiceResolver.requiresPinnedMandarinVoice(for: languageIdentifier),
+           startMandarinSpeech(trimmedText) {
+            activeTarget = target
+            activeUtteranceIdentifier = nil
+            logger.info(
+                "Speech engine=say selectedLanguage=zh-CN selectedName=\(SpeechVoiceResolver.mandarinVoiceName, privacy: .public)"
+            )
+            return
+        }
+
+        let utterance = AVSpeechUtterance(string: trimmedText)
+        if let voice = SpeechVoiceResolver.voice(for: languageIdentifier) {
+            utterance.voice = voice
+            logger.info(
+                "Speech voice requested=\(languageIdentifier ?? "system", privacy: .public) selectedLanguage=\(voice.language, privacy: .public) selectedName=\(voice.name, privacy: .public) selectedIdentifier=\(voice.identifier, privacy: .public)"
+            )
+        } else {
+            logger.error("No speech voice found for \(languageIdentifier ?? "system", privacy: .public)")
+        }
+        utterance.rate = AVSpeechUtteranceDefaultSpeechRate
+
+        activeTarget = target
+        activeUtteranceIdentifier = ObjectIdentifier(utterance)
+        synthesizer.speak(utterance)
+    }
+
+    func stop() {
+        activeTarget = nil
+        activeUtteranceIdentifier = nil
+        mandarinProcessIdentifier = nil
+        if mandarinProcess?.isRunning == true {
+            mandarinProcess?.terminate()
+        }
+        mandarinProcess = nil
+        if synthesizer.isSpeaking {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
+    }
+
+    private func startMandarinSpeech(_ text: String) -> Bool {
+        let process = Process()
+        let inputPipe = Pipe()
+        let processIdentifier = UUID()
+        process.executableURL = SpeechVoiceResolver.sayExecutableURL
+        process.arguments = ["-v", SpeechVoiceResolver.mandarinVoiceName]
+        process.standardInput = inputPipe
+        process.terminationHandler = { [weak self] _ in
+            Task { @MainActor in
+                guard self?.mandarinProcessIdentifier == processIdentifier else { return }
+                self?.mandarinProcess = nil
+                self?.mandarinProcessIdentifier = nil
+                self?.activeTarget = nil
+            }
+        }
+
+        do {
+            try process.run()
+            mandarinProcess = process
+            mandarinProcessIdentifier = processIdentifier
+            inputPipe.fileHandleForWriting.write(Data(text.utf8))
+            try inputPipe.fileHandleForWriting.close()
+            return true
+        } catch {
+            logger.error("Unable to launch pinned Mandarin voice: \(String(describing: error), privacy: .public)")
+            return false
+        }
+    }
+
+    nonisolated func speechSynthesizer(
+        _ synthesizer: AVSpeechSynthesizer,
+        didFinish utterance: AVSpeechUtterance
+    ) {
+        finishIfActive(utterance)
+    }
+
+    nonisolated func speechSynthesizer(
+        _ synthesizer: AVSpeechSynthesizer,
+        didCancel utterance: AVSpeechUtterance
+    ) {
+        finishIfActive(utterance)
+    }
+
+    nonisolated private func finishIfActive(_ utterance: AVSpeechUtterance) {
+        let identifier = ObjectIdentifier(utterance)
+        Task { @MainActor [weak self] in
+            guard self?.activeUtteranceIdentifier == identifier else { return }
+            self?.activeTarget = nil
+            self?.activeUtteranceIdentifier = nil
+        }
+    }
+
+}
+
+enum SpeechVoiceResolver {
+    static let mandarinVoiceIdentifier = "com.apple.voice.compact.zh-CN.Tingting"
+    static let mandarinVoiceName = "Tingting"
+    static let sayExecutableURL = URL(fileURLWithPath: "/usr/bin/say")
+
+    private static let mandarinFallbackIdentifiers = [
+        mandarinVoiceIdentifier,
+        "com.apple.ttsbundle.siri_yushu_zh-CN_compact",
+        "com.apple.ttsbundle.siri_limu_zh-CN_compact"
+    ]
+
+    static func voice(for languageIdentifier: String?) -> AVSpeechSynthesisVoice? {
+        guard let languageIdentifier else { return nil }
+
+        if LanguageRouter.isChinese(Locale.Language(identifier: languageIdentifier)) {
+            for identifier in mandarinFallbackIdentifiers {
+                if let voice = AVSpeechSynthesisVoice(identifier: identifier) {
+                    return voice
+                }
+            }
+            if let installedMandarinVoice = AVSpeechSynthesisVoice.speechVoices().first(where: {
+                $0.language.caseInsensitiveCompare("zh-CN") == .orderedSame
+            }) {
+                return installedMandarinVoice
+            }
+            return AVSpeechSynthesisVoice(language: "zh-CN")
+        }
+
+        if let exactVoice = AVSpeechSynthesisVoice(language: languageIdentifier) {
+            return exactVoice
+        }
+        guard let languageCode = Locale.Language(identifier: languageIdentifier).languageCode?.identifier else {
+            return nil
+        }
+        return AVSpeechSynthesisVoice(language: languageCode)
+    }
+
+    static func requiresPinnedMandarinVoice(for languageIdentifier: String?) -> Bool {
+        guard let languageIdentifier else { return false }
+        return LanguageRouter.isChinese(Locale.Language(identifier: languageIdentifier))
+    }
+}
+
+private struct SpeechActionButton: View {
+    let title: String
+    let isSpeaking: Bool
+    let isDisabled: Bool
+    let action: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: isSpeaking ? "stop.fill" : "speaker.wave.2.fill")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(isSpeaking ? Color.accentColor : Color.primary)
+                .frame(width: 28, height: 28)
+                .background {
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(
+                            isSpeaking
+                                ? Color.accentColor.opacity(0.13)
+                                : Color.primary.opacity(isHovering ? 0.075 : 0)
+                        )
+                }
+                .contentShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.42 : 1)
+        .onHover { hovering in
+            withAnimation(.easeOut(duration: 0.12)) {
+                isHovering = hovering
+            }
+        }
+        .help(title)
+        .accessibilityLabel(title)
     }
 }

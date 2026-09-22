@@ -1,3 +1,4 @@
+import AVFoundation
 import AppKit
 import Foundation
 import XCTest
@@ -23,6 +24,39 @@ final class TranslationViewModelTests: XCTestCase {
             return XCTFail("Expected success")
         }
         XCTAssertEqual(translated, "你好")
+        XCTAssertEqual(viewModel.sourceLanguageIdentifier, "en")
+        XCTAssertEqual(viewModel.targetLanguageIdentifier, "zh-CN")
+    }
+
+    func testChineseSpeechDefaultsToMandarinVoices() {
+        XCTAssertEqual(
+            TranslationViewModel.speechIdentifier(for: Locale.Language(identifier: "zh-Hans")),
+            "zh-CN"
+        )
+        XCTAssertEqual(
+            TranslationViewModel.speechIdentifier(for: Locale.Language(identifier: "zh-Hant")),
+            "zh-CN"
+        )
+        XCTAssertEqual(
+            TranslationViewModel.speechIdentifier(for: Locale.Language(identifier: "yue")),
+            "zh-CN"
+        )
+        XCTAssertEqual(
+            TranslationViewModel.speechIdentifier(for: Locale.Language(identifier: "zh-HK")),
+            "zh-CN"
+        )
+    }
+
+    func testChineseSpeechPinsTingtingMandarinVoice() {
+        let voice = SpeechVoiceResolver.voice(for: "zh-CN")
+        XCTAssertEqual(voice?.identifier, SpeechVoiceResolver.mandarinVoiceIdentifier)
+        XCTAssertEqual(voice?.language, "zh-CN")
+        XCTAssertTrue(SpeechVoiceResolver.requiresPinnedMandarinVoice(for: "zh-CN"))
+        XCTAssertTrue(SpeechVoiceResolver.requiresPinnedMandarinVoice(for: "zh-HK"))
+        XCTAssertFalse(SpeechVoiceResolver.requiresPinnedMandarinVoice(for: "en"))
+        XCTAssertEqual(SpeechVoiceResolver.mandarinVoiceName, "Tingting")
+        XCTAssertEqual(SpeechVoiceResolver.sayExecutableURL.path, "/usr/bin/say")
+        XCTAssertTrue(FileManager.default.isExecutableFile(atPath: SpeechVoiceResolver.sayExecutableURL.path))
     }
 
     func testLoadingToFailure() async {

@@ -26,6 +26,8 @@ final class TranslationViewModel: ObservableObject {
     @Published private(set) var state: TranslationViewState = .idle
     @Published private(set) var draftOriginal = ""
     @Published private(set) var isRetranslating = false
+    private(set) var sourceLanguageIdentifier: String?
+    private(set) var targetLanguageIdentifier: String?
 
     static let maximumEditableCharacterCount = AXSelectedTextProvider.maximumCharacterCount
 
@@ -50,6 +52,8 @@ final class TranslationViewModel: ObservableObject {
         currentRequestID = request.id
         draftOriginal = request.text
         isRetranslating = false
+        sourceLanguageIdentifier = nil
+        targetLanguageIdentifier = nil
         state = .loading(original: request.text)
         logger.debug("State changed to loading")
     }
@@ -98,6 +102,8 @@ final class TranslationViewModel: ObservableObject {
                 let elapsed = request.createdAt.duration(to: .now)
                 self.logger.info("Translation request completed in \(String(describing: elapsed), privacy: .public)")
                 self.isRetranslating = false
+                self.sourceLanguageIdentifier = Self.speechIdentifier(for: result.sourceLanguage)
+                self.targetLanguageIdentifier = Self.speechIdentifier(for: result.targetLanguage)
                 self.state = .success(
                     original: request.text,
                     translated: result.translatedText,
@@ -139,6 +145,8 @@ final class TranslationViewModel: ObservableObject {
         isRetranslating = false
         let elapsed = request.createdAt.duration(to: .now)
         logger.info("Translation request completed in \(String(describing: elapsed), privacy: .public)")
+        sourceLanguageIdentifier = Self.speechIdentifier(for: result.sourceLanguage)
+        targetLanguageIdentifier = Self.speechIdentifier(for: result.targetLanguage)
         state = .success(
             original: request.text,
             translated: result.translatedText,
@@ -270,9 +278,19 @@ final class TranslationViewModel: ObservableObject {
     private func cancelAndResetRequest() {
         cancelActiveTranslation()
         currentRequestID = nil
+        sourceLanguageIdentifier = nil
+        targetLanguageIdentifier = nil
     }
 
     private static func displayName(_ language: Locale.Language, fallback: String) -> String {
         Locale.current.localizedString(forIdentifier: language.minimalIdentifier) ?? fallback
     }
+
+    static func speechIdentifier(for language: Locale.Language) -> String {
+        guard LanguageRouter.isChinese(language) else {
+            return language.minimalIdentifier
+        }
+        return "zh-CN"
+    }
+
 }
