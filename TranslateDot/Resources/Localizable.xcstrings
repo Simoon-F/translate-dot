@@ -1,0 +1,222 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "error.ax_failure" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't read the selected text. Try again." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "读取选中文本失败，请重试。" } }
+      }
+    },
+    "error.empty_translation" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The system returned no translation. Try again." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "系统没有返回翻译结果，请重试。" } }
+      }
+    },
+    "error.focus_unavailable" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't read the current focus. Return to the original app and select the text again." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法读取当前焦点。请返回原应用并重新选择文本。" } }
+      }
+    },
+    "error.no_selection" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select some text first." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "请先选择需要翻译的文本。" } }
+      }
+    },
+    "error.nothing_to_translate" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The selected text contains nothing to translate." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选中的文本没有可翻译内容。" } }
+      }
+    },
+    "error.permission_required" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Accessibility permission is required to read selected text in other apps." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "需要辅助功能权限才能读取其他应用中选中的文本。" } }
+      }
+    },
+    "error.same_language" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The source and target languages are the same." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "检测到源语言与目标语言相同。" } }
+      }
+    },
+    "error.selection_too_long" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The selected text is too long. Keep it under %lld characters." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选中的文本过长，请控制在 %lld 个字符以内。" } }
+      }
+    },
+    "error.selection_unsupported" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This app doesn't currently support direct text selection." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "当前应用暂不支持直接取词。" } }
+      }
+    },
+    "error.translation_failed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Translation failed. Check the language model and try again." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "翻译失败。请检查语言模型后重试。" } }
+      }
+    },
+    "error.translation_unsupported" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Apple Translation doesn't support this language pair." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Apple Translation 暂不支持当前语言组合。" } }
+      }
+    },
+    "error.unable_identify_language" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't reliably identify the source language. Select a longer passage and try again." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法可靠识别源语言，请选择更完整的文本后重试。" } }
+      }
+    },
+    "hotkey.conflict" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Global shortcut ⌥D is used by another app. Close the conflicting app and restart TranslateDot." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "全局快捷键 ⌥D 已被其他应用占用，请关闭冲突应用后重新启动 TranslateDot。" } }
+      }
+    },
+    "hotkey.registration_failed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn't register global shortcut ⌥D. Restart the app." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "无法注册全局快捷键 ⌥D，请重新启动应用。" } }
+      }
+    },
+    "language.auto_detect" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Auto-detect" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "自动检测" } }
+      }
+    },
+    "menu.about" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "About TranslateDot" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关于 TranslateDot" } }
+      }
+    },
+    "menu.accessibility_granted" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Accessibility Permission: Granted" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "辅助功能权限：已授权" } }
+      }
+    },
+    "menu.open_accessibility_settings" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Accessibility Settings…" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开辅助功能设置…" } }
+      }
+    },
+    "menu.quit" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Quit TranslateDot" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "退出 TranslateDot" } }
+      }
+    },
+    "menu.translate_selection" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Translate Selection" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "翻译所选文本" } }
+      }
+    },
+    "panel.check_again" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Check Again" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重新检查" } }
+      }
+    },
+    "panel.checking_language" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Checking language…" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在检查语言…" } }
+      }
+    },
+    "panel.close" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Close" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关闭" } }
+      }
+    },
+    "panel.copied" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Copied" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已复制" } }
+      }
+    },
+    "panel.copy_translation" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Copy Translation" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "复制译文" } }
+      }
+    },
+    "panel.failure_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Translation Incomplete" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "翻译未完成" } }
+      }
+    },
+    "panel.idle_message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "TranslateDot will show the system translation here." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "TranslateDot 会在这里显示系统翻译结果。" } }
+      }
+    },
+    "panel.idle_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select text, then press ⌥D" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择文本后按 ⌥D" } }
+      }
+    },
+    "panel.no_selection_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No translatable selection" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "没有可翻译的选区" } }
+      }
+    },
+    "panel.open_settings" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open System Settings" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开系统设置" } }
+      }
+    },
+    "panel.permission_message" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "TranslateDot only uses this permission to read text you explicitly select. After granting access, the app checks automatically." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "TranslateDot 只使用此权限读取你主动选中的文本。授权后，应用会自动检查权限是否已经生效。" } }
+      }
+    },
+    "panel.permission_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Accessibility Permission Required" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "需要辅助功能权限" } }
+      }
+    },
+    "panel.preparing_model" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Preparing language model…" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在准备语言模型…" } }
+      }
+    },
+    "panel.unsupported_title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not Supported" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "暂不支持" } }
+      }
+    },
+    "permission.activated" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Permission is active. Return to the original app, select the text again, then press ⌥D." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "权限已生效。请返回原应用、重新选择文本，然后按 ⌥D。" } }
+      }
+    },
+    "permission.granted" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Permission granted. Select text in another app, then press ⌥D." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "权限已授予。请在其他应用中选择文本，然后按 ⌥D。" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
