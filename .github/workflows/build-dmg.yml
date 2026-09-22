@@ -25,6 +25,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # changelogithub 需要完整提交历史和 tag 来生成变更日志
+          fetch-depth: 0
 
       - name: 校验版本号
         run: |
@@ -45,6 +48,10 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
+      # 说明：这里使用 ad-hoc 签名（CODE_SIGN_IDENTITY=-）而不是完全跳过签名。
+      # macOS 的 TCC（辅助功能权限）对完全未签名的 app 不可靠：即使系统设置里
+      # 开关已打开，AXIsProcessTrusted 也可能一直返回 false。ad-hoc 签名的
+      # app 可以正常授予辅助功能权限，且覆盖安装到同一路径后授权仍然保留。
       - name: Build (Release)
         run: |
           set -o pipefail
@@ -53,13 +60,18 @@ jobs:
             -configuration Release \
             -destination 'platform=macOS' \
             -derivedDataPath .build/DerivedData \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=YES \
+            DEVELOPMENT_TEAM= \
             build | tee build.log
 
       - name: Verify app bundle
         run: |
           test -d "$APP_PATH" || { echo "::error::未找到 $APP_PATH"; exit 1; }
           /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Contents/Info.plist"
+          codesign --verify --strict "$APP_PATH"
+          codesign -dv "$APP_PATH" 2>&1 | grep -E 'Signature|Identifier' || true
 
       - name: Create DMG
         run: |
@@ -80,15 +92,40 @@ jobs:
           path: TranslateDot-*.dmg
           if-no-files-found: error
 
-      - name: Create tag & GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ inputs.version }}
-          name: TranslateDot v${{ inputs.version }}
-          body: |
-            TranslateDot v${{ inputs.version }}
+      - name: 计算上一个 tag
+        run: |
+          echo "PREV_TAG=$(git tag --sort=-v:refname | head -1)" >> "$GITHUB_ENV"
 
-            - DMG 构建于 GitHub Actions（未签名，首次打开请右键 → 打开）
-          files: TranslateDot-*.dmg
-          generate_release_notes: true
-          fail_on_unmatched_files: true
+      - name: Push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$VERSION" -m "TranslateDot v$VERSION"
+          git push origin "v$VERSION"
+
+      - name: Create Release (changelogithub)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ARGS=(--to "v$VERSION" --name "TranslateDot v$VERSION" --assets "TranslateDot-$VERSION.dmg" --emoji --group --contributors)
+          if [ -n "$PREV_TAG" ]; then
+            ARGS=(--from "$PREV_TAG" "${ARGS[@]}")
+          fi
+          npx -y changelogithub "${ARGS[@]}"
+
+      - name: 追加安装说明
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "v$VERSION" --json body --jq .body > release-notes.md
+          {
+            echo ""
+            echo "## 安装说明"
+            echo ""
+            echo "1. 下载下方附件 \`TranslateDot-$VERSION.dmg\`，打开后将 TranslateDot 拖入「应用程序」文件夹。"
+            echo "2. 首次启动后按应用内提示，在「系统设置 → 隐私与安全性 → 辅助功能」中开启 TranslateDot。"
+            echo "3. 系统要求：macOS 15.0 或更高版本。"
+            echo ""
+            echo "本构建未进行 Apple 公证，首次打开如提示无法验证开发者，请在应用图标上右键选择「打开」。从旧版本覆盖安装后如辅助功能失效，请先运行 \`tccutil reset Accessibility com.simon.translatedot\` 再重新授权。"
+          } >> release-notes.md
+          gh release edit "v$VERSION" --notes-file release-notes.md
