@@ -1,0 +1,94 @@
+name: Build DMG & Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号，例如 1.2.3（将创建 tag v1.2.3 并发布 Release）'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-v${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  build-dmg:
+    runs-on: macos-latest
+    env:
+      VERSION: ${{ inputs.version }}
+      APP_PATH: .build/DerivedData/Build/Products/Release/TranslateDot.app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 校验版本号
+        run: |
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$'; then
+            echo "::error::版本号必须是 semver 格式，例如 1.2.3（当前输入：$VERSION）"
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null 2>&1; then
+            echo "::error::远端已存在 tag v$VERSION，请换一个版本号"
+            exit 1
+          fi
+
+      - name: 写入版本号到 Info.plist
+        run: |
+          plutil -replace CFBundleShortVersionString -string "$VERSION" TranslateDot/Resources/Info.plist
+          plutil -replace CFBundleVersion -string "$VERSION" TranslateDot/Resources/Info.plist
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build (Release)
+        run: |
+          set -o pipefail
+          xcodebuild -project TranslateDot.xcodeproj \
+            -scheme TranslateDot \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            -derivedDataPath .build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            build | tee build.log
+
+      - name: Verify app bundle
+        run: |
+          test -d "$APP_PATH" || { echo "::error::未找到 $APP_PATH"; exit 1; }
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Contents/Info.plist"
+
+      - name: Create DMG
+        run: |
+          STAGING=$(mktemp -d)
+          cp -R "$APP_PATH" "$STAGING/"
+          ln -s /Applications "$STAGING/Applications"
+          hdiutil create \
+            -volname "TranslateDot $VERSION" \
+            -srcfolder "$STAGING" \
+            -format UDZO \
+            -ov \
+            "TranslateDot-$VERSION.dmg"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TranslateDot-${{ inputs.version }}-dmg
+          path: TranslateDot-*.dmg
+          if-no-files-found: error
+
+      - name: Create tag & GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: TranslateDot v${{ inputs.version }}
+          body: |
+            TranslateDot v${{ inputs.version }}
+
+            - DMG 构建于 GitHub Actions（未签名，首次打开请右键 → 打开）
+          files: TranslateDot-*.dmg
+          generate_release_notes: true
+          fail_on_unmatched_files: true
