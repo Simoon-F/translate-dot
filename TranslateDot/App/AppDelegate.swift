@@ -47,6 +47,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appState?.translateScreenshot()
     }
 
+    func activateSettingsWindow() {
+        NSApp.activate(ignoringOtherApps: true)
+        bringSettingsWindowForward(after: 0)
+        bringSettingsWindowForward(after: 0.15)
+        bringSettingsWindowForward(after: 0.4)
+    }
+
+    private func bringSettingsWindowForward(after delay: TimeInterval) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            NSApp.activate(ignoringOtherApps: true)
+            let settingsWindow = NSApp.windows.first { window in
+                window.identifier?.rawValue == "TranslateDot.SettingsWindow"
+                    || (window.isVisible && window.canBecomeKey && !(window is NSPanel))
+            }
+            settingsWindow?.level = .floating
+            settingsWindow?.hidesOnDeactivate = false
+            settingsWindow?.collectionBehavior.insert(.moveToActiveSpace)
+            settingsWindow?.orderFrontRegardless()
+            settingsWindow?.makeKey()
+        }
+    }
+
     func openAccessibilitySettings() {
         appState?.permissionManager.openSystemSettings()
     }

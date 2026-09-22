@@ -1,3 +1,4 @@
+import AppKit
 import KeyboardShortcuts
 import SwiftUI
 
@@ -23,6 +24,7 @@ struct SettingsView: View {
                 }
         }
         .frame(width: 620, height: 430)
+        .background(SettingsWindowActivationView())
     }
 
     private var translationSettings: some View {
@@ -120,6 +122,33 @@ struct SettingsView: View {
         ForEach(settings.supportedLanguageIdentifiers, id: \.self) { identifier in
             Text(settings.languageDisplayName(for: identifier))
                 .tag(identifier)
+        }
+    }
+}
+
+private struct SettingsWindowActivationView: NSViewRepresentable {
+    func makeNSView(context: Context) -> SettingsWindowActivationNSView {
+        SettingsWindowActivationNSView()
+    }
+
+    func updateNSView(_ nsView: SettingsWindowActivationNSView, context: Context) {}
+}
+
+private final class SettingsWindowActivationNSView: NSView {
+    static let windowIdentifier = NSUserInterfaceItemIdentifier("TranslateDot.SettingsWindow")
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        guard let window else { return }
+        DispatchQueue.main.async { [weak window] in
+            guard let window else { return }
+            window.identifier = Self.windowIdentifier
+            window.level = .floating
+            window.hidesOnDeactivate = false
+            window.collectionBehavior.insert(.moveToActiveSpace)
+            NSApp.activate(ignoringOtherApps: true)
+            window.orderFrontRegardless()
+            window.makeKey()
         }
     }
 }

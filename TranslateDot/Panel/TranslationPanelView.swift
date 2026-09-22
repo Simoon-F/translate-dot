@@ -37,19 +37,11 @@ struct TranslationPanelView: View {
             Text("TranslateDot")
                 .font(.headline)
             Spacer()
-            Button {
-                viewModel.dismiss()
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.system(size: 11, weight: .semibold))
-                    .frame(width: 22, height: 22)
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
-            .accessibilityLabel(L10n.string("panel.close", defaultValue: "Close"))
+            PanelCloseButton(action: viewModel.dismiss)
         }
         .padding(.horizontal, 16)
         .frame(height: 45)
+        .background(PanelDragRegion())
     }
 
     @ViewBuilder
@@ -277,6 +269,49 @@ struct TranslationPanelView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+}
+
+private struct PanelCloseButton: View {
+    let action: () -> Void
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "xmark")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(isHovering ? .primary : .secondary)
+                .frame(width: 26, height: 26)
+                .background {
+                    Circle()
+                        .fill(.primary.opacity(isHovering ? 0.12 : 0))
+                }
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering in
+            withAnimation(.easeOut(duration: 0.12)) {
+                isHovering = hovering
+            }
+        }
+        .help(L10n.string("panel.close", defaultValue: "Close"))
+        .accessibilityLabel(L10n.string("panel.close", defaultValue: "Close"))
+    }
+}
+
+private struct PanelDragRegion: NSViewRepresentable {
+    func makeNSView(context: Context) -> PanelDragView {
+        PanelDragView()
+    }
+
+    func updateNSView(_ nsView: PanelDragView, context: Context) {}
+}
+
+private final class PanelDragView: NSView {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+    override func mouseDown(with event: NSEvent) {
+        window?.performDrag(with: event)
     }
 }
 

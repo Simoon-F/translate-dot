@@ -33,6 +33,9 @@ struct TranslateDotApp: App {
                     systemImage: "gearshape"
                 )
             }
+            .simultaneousGesture(TapGesture().onEnded {
+                appDelegate.activateSettingsWindow()
+            })
 
             Divider()
 
