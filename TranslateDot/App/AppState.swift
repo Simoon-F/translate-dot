@@ -64,6 +64,9 @@ final class AppState {
         viewModel.onRetranslate = { [weak self] text in
             self?.translateEditedText(text)
         }
+        viewModel.onManualTranslate = { [weak self] text in
+            self?.translateManualText(text)
+        }
         viewModel.onDismiss = { [weak panelController] in
             panelController?.hide()
         }
@@ -142,6 +145,7 @@ final class AppState {
             logger.error("Selection lookup failed: \(error.logDescription, privacy: .public)")
             viewModel.showSelectionError(error)
             panelController.show(anchor: nil)
+            panelController.focusTextInput()
         }
     }
 
@@ -187,6 +191,13 @@ final class AppState {
     private func translateEditedText(_ text: String) {
         let request = TranslationRequest(text: text)
         viewModel.beginRetranslation(for: request)
+        coordinator.submit(request)
+    }
+
+    private func translateManualText(_ text: String) {
+        let request = TranslationRequest(text: text)
+        viewModel.showLoading(for: request)
+        panelController.show(anchor: nil)
         coordinator.submit(request)
     }
 

@@ -17,6 +17,7 @@ enum TranslationViewState: Equatable {
     case permissionRequired
     case screenCapturePermissionRequired
     case noSelection(message: String)
+    case manualInput(hint: String)
     case unsupported(message: String)
     case failure(message: String)
 }
@@ -25,6 +26,7 @@ enum TranslationViewState: Equatable {
 final class TranslationViewModel: ObservableObject {
     @Published private(set) var state: TranslationViewState = .idle
     @Published private(set) var draftOriginal = ""
+    @Published private(set) var manualInputText = ""
     @Published private(set) var isRetranslating = false
     private(set) var sourceLanguageIdentifier: String?
     private(set) var targetLanguageIdentifier: String?
@@ -36,6 +38,7 @@ final class TranslationViewModel: ObservableObject {
     var onOpenScreenCaptureSettings: (() -> Void)?
     var onRetryScreenCapture: (() -> Void)?
     var onRetranslate: ((String) -> Void)?
+    var onManualTranslate: ((String) -> Void)?
     var onDismiss: (() -> Void)?
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.simon.translatedot", category: "ViewModel")
@@ -177,7 +180,7 @@ final class TranslationViewModel: ObservableObject {
         case .selectedTextUnsupported:
             state = .unsupported(message: error.userMessage)
         default:
-            state = .noSelection(message: error.userMessage)
+            showManualInput(hint: error.userMessage)
         }
     }
 
@@ -185,6 +188,14 @@ final class TranslationViewModel: ObservableObject {
         cancelAndResetRequest()
         isRetranslating = false
         state = .noSelection(message: message)
+    }
+
+    func showManualInput(hint: String) {
+        cancelAndResetRequest()
+        isRetranslating = false
+        manualInputText = ""
+        state = .manualInput(hint: hint)
+        logger.debug("State changed to manual input")
     }
 
     func showFailure(_ message: String, requestID: UUID? = nil) {
@@ -240,6 +251,27 @@ final class TranslationViewModel: ObservableObject {
     func retranslateDraft() {
         guard canRetranslate else { return }
         onRetranslate?(draftOriginal.trimmingCharacters(in: .whitespacesAndNewlines))
+    }
+
+    func updateManualInput(_ text: String) {
+        manualInputText = text
+    }
+
+    var isManualInputTooLong: Bool {
+        manualInputText.count > Self.maximumEditableCharacterCount
+    }
+
+    var canSubmitManualInput: Bool {
+        !trimmedManualInput.isEmpty && !isManualInputTooLong
+    }
+
+    func submitManualInput() {
+        guard canSubmitManualInput else { return }
+        onManualTranslate?(trimmedManualInput)
+    }
+
+    private var trimmedManualInput: String {
+        manualInputText.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func copy(_ target: TranslationCopyTarget) {

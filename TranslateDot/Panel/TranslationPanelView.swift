@@ -114,6 +114,9 @@ struct TranslationPanelView: View {
                 message: message
             )
 
+        case .manualInput(let hint):
+            ManualInputView(viewModel: viewModel, hint: hint)
+
         case .unsupported(let message):
             messageView(
                 icon: "exclamationmark.bubble",
@@ -241,6 +244,88 @@ struct TranslationPanelView: View {
             }
         }
         .padding(20)
+    }
+}
+
+private struct ManualInputView: View {
+    @ObservedObject var viewModel: TranslationViewModel
+    let hint: String
+    @FocusState private var isEditorFocused: Bool
+
+    private var editorBorderColor: Color {
+        isEditorFocused ? Color.accentColor.opacity(0.45) : Color.primary.opacity(0.10)
+    }
+
+    var body: some View {
+        PanelCard {
+            VStack(alignment: .leading, spacing: 12) {
+                Label(
+                    L10n.string("panel.manual_input_title", defaultValue: "Type Text to Translate"),
+                    systemImage: "square.and.pencil"
+                )
+                .font(.system(size: 14, weight: .semibold))
+                Text(hint)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                TextField(
+                    L10n.string(
+                        "panel.manual_input_placeholder",
+                        defaultValue: "Enter or paste the text to translate…"
+                    ),
+                    text: Binding(
+                        get: { viewModel.manualInputText },
+                        set: { value in viewModel.updateManualInput(value) }
+                    ),
+                    axis: .vertical
+                )
+                .font(.system(size: 13))
+                .lineSpacing(2)
+                .lineLimit(4...6)
+                .textFieldStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 7)
+                .background(Color.primary.opacity(0.028), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .strokeBorder(editorBorderColor, lineWidth: 1)
+                }
+                .focused($isEditorFocused)
+                HStack(spacing: 8) {
+                    Text(L10n.string(
+                        "panel.manual_input_hint",
+                        defaultValue: "Type or paste the text, then translate."
+                    ))
+                    .font(.system(size: 12))
+                    .lineLimit(1)
+                    .foregroundStyle(viewModel.isManualInputTooLong ? Color.red : Color.secondary)
+                    Spacer()
+                    Text("\(viewModel.manualInputText.count) / \(TranslationViewModel.maximumEditableCharacterCount)")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundStyle(viewModel.isManualInputTooLong ? Color.red : Color.secondary.opacity(0.75))
+                    Button {
+                        viewModel.submitManualInput()
+                    } label: {
+                        Label(
+                            L10n.string("panel.translate", defaultValue: "Translate"),
+                            systemImage: "arrow.right.circle.fill"
+                        )
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.regular)
+                    .font(.system(size: 12, weight: .medium))
+                    .disabled(!viewModel.canSubmitManualInput)
+                    .keyboardShortcut(.return, modifiers: [.command])
+                }
+            }
+        }
+        .padding(20)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                isEditorFocused = true
+            }
+        }
     }
 }
 

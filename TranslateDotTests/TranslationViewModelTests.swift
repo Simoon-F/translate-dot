@@ -226,6 +226,41 @@ final class TranslationViewModelTests: XCTestCase {
         XCTAssertEqual(translated, "你好，世界")
     }
 
+    func testSelectionErrorFallsBackToManualInput() {
+        let viewModel = TranslationViewModel()
+        viewModel.showLoading(for: TranslationRequest(text: "Hello"))
+        viewModel.showSelectionError(.noSelection)
+
+        XCTAssertEqual(
+            viewModel.state,
+            .manualInput(hint: SelectedTextError.noSelection.userMessage)
+        )
+        XCTAssertEqual(viewModel.manualInputText, "")
+    }
+
+    func testManualInputSubmitsTrimmedTextAndRejectsOversizedInput() {
+        let viewModel = TranslationViewModel()
+        viewModel.showSelectionError(.noSelection)
+        XCTAssertFalse(viewModel.canSubmitManualInput)
+
+        var submittedText: String?
+        viewModel.onManualTranslate = { submittedText = $0 }
+        viewModel.updateManualInput("  Bonjour le monde  ")
+        XCTAssertTrue(viewModel.canSubmitManualInput)
+        XCTAssertFalse(viewModel.isManualInputTooLong)
+        viewModel.submitManualInput()
+        XCTAssertEqual(submittedText, "Bonjour le monde")
+
+        viewModel.updateManualInput(String(
+            repeating: "a",
+            count: TranslationViewModel.maximumEditableCharacterCount + 1
+        ))
+        XCTAssertTrue(viewModel.isManualInputTooLong)
+        XCTAssertFalse(viewModel.canSubmitManualInput)
+        viewModel.submitManualInput()
+        XCTAssertEqual(submittedText, "Bonjour le monde")
+    }
+
     private static func result(_ text: String) -> TranslationResult {
         TranslationResult(
             translatedText: text,
