@@ -31,7 +31,6 @@ Select text in any app, and the translation appears instantly in a floating pane
   - [Command-line build and test](#command-line-build-and-test)
 - [System Permissions](#system-permissions)
 - [Privacy](#privacy)
-- [Known Limitations](#known-limitations)
 - [Troubleshooting](#troubleshooting)
 - [Development](#development)
 - [Roadmap](#roadmap)
@@ -41,8 +40,6 @@ Select text in any app, and the translation appears instantly in a floating pane
 TranslateDot is a native macOS menu bar app. It reads the current text selection through the macOS Accessibility API, translates it on-device with the Apple Translation framework, and presents the result in a non-activating floating panel — without interrupting your workflow and without any cloud translation service.
 
 Core flow: **select text or a screen region → press a hotkey → local recognition and translation → floating result**.
-
-<!-- Screenshot placeholder: after code signing and Accessibility approval, add light/dark mode screenshots under docs/screenshots/ and reference them here. -->
 
 ## Features
 
@@ -116,14 +113,6 @@ Screenshot translation requires macOS Screen & System Audio Recording access. Tr
 - No translation history, source text, or translations are stored
 - Logs contain only permission state, error types, state transitions, and request durations — never selected content
 - When direct capture fails, the host app's Copy command is invoked briefly and the clipboard is restored afterwards; source text never remains on the clipboard, and a translation is only placed on the clipboard after clicking "Copy Translation"
-
-## Known Limitations
-
-- Some Electron apps, custom-drawn UIs, terminals, and PDF readers may not expose `AXSelectedText`; use ⌥S screenshot translation instead
-- OCR quality depends on image clarity, text size, rotation, and languages supported by the system Vision framework
-- Automatic language detection may be ambiguous for very short or mixed-language text; unrecognized input defaults to Simplified Chinese
-- Language model availability, first-use authorization, and download progress are managed by macOS
-- "Translate Selection" in the menu bar makes the menu the active responder; the global hotkey ⌥D is the most reliable capture entry point
 
 ## Troubleshooting
 
