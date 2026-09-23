@@ -1549,6 +1549,22 @@
         }
       }
     },
+    "panel.translation_placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The translation will appear here."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "译文会显示在这里。"
+          }
+        }
+      }
+    },
     "TranslateDot" : {
 
     }

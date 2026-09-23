@@ -2,28 +2,34 @@ import AVFoundation
 import os
 import SwiftUI
 
-struct TranslationSuccessContent: View {
+struct TranslationPanelContent: View {
     @ObservedObject var viewModel: TranslationViewModel
-    let translated: String
-    let source: String
-    let target: String
-    let copied: TranslationCopyTarget?
+    var source: String?
+    var target: String?
+    var translated: String?
+    var statusMessage: String?
+    var hint: String?
     @StateObject private var speechController = TextSpeechController()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            LanguageRouteBar(source: source, target: target)
+            LanguageRouteBar(
+                source: source ?? L10n.string("language.auto_detect", defaultValue: "Auto-detect"),
+                target: target ?? AppSettings.shared.languageDisplayName(
+                    for: AppSettings.shared.targetLanguageIdentifier
+                )
+            )
             Divider().opacity(0.45)
             OriginalEditorCard(
                 viewModel: viewModel,
-                copied: copied == .original,
+                hint: hint,
                 speechController: speechController
             )
             Divider().opacity(0.45)
             TranslationResultCard(
                 viewModel: viewModel,
                 translated: translated,
-                copied: copied == .translation,
+                statusMessage: statusMessage,
                 speechController: speechController
             )
             .frame(minHeight: 120, maxHeight: .infinity)
@@ -34,7 +40,7 @@ struct TranslationSuccessContent: View {
     }
 }
 
-private struct LanguageRouteBar: View {
+struct LanguageRouteBar: View {
     let source: String
     let target: String
 
@@ -43,11 +49,13 @@ private struct LanguageRouteBar: View {
             Image(systemName: "globe.asia.australia.fill")
                 .foregroundStyle(.tint)
             Text(source)
+                .lineLimit(1)
                 .fontWeight(.medium)
             Image(systemName: "arrow.right")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.tertiary)
             Text(target)
+                .lineLimit(1)
                 .fontWeight(.medium)
             Spacer()
             Text("⌘↩")
@@ -62,8 +70,13 @@ private struct LanguageRouteBar: View {
 
 private struct OriginalEditorCard: View {
     @ObservedObject var viewModel: TranslationViewModel
-    let copied: Bool
+    let hint: String?
     @ObservedObject var speechController: TextSpeechController
+    @FocusState private var isEditorFocused: Bool
+
+    private var originalIsEmpty: Bool {
+        viewModel.activeOriginalText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
@@ -73,6 +86,12 @@ private struct OriginalEditorCard: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
+        .onAppear {
+            guard viewModel.isManualEditMode else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                isEditorFocused = true
+            }
+        }
     }
 
     private var header: some View {
@@ -85,34 +104,43 @@ private struct OriginalEditorCard: View {
                     ? L10n.string("panel.stop_reading", defaultValue: "Stop Reading")
                     : L10n.string("panel.read_original", defaultValue: "Read Original"),
                 isSpeaking: speechController.activeTarget == .original,
-                isDisabled: viewModel.draftOriginal.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                isDisabled: originalIsEmpty,
                 action: {
                     speechController.toggle(
                         target: .original,
-                        text: viewModel.draftOriginal,
+                        text: viewModel.activeOriginalText,
                         languageIdentifier: viewModel.sourceLanguageIdentifier
                     )
                 }
             )
             PanelActionButton(
-                title: copied
+                title: isOriginalCopied
                     ? L10n.string("panel.copied", defaultValue: "Copied")
                     : L10n.string("panel.copy_original", defaultValue: "Copy Original"),
-                systemImage: copied ? "checkmark" : "doc.on.doc",
-                isConfirmed: copied,
+                systemImage: isOriginalCopied ? "checkmark" : "doc.on.doc",
+                isConfirmed: isOriginalCopied,
+                isDisabled: originalIsEmpty,
                 action: { viewModel.copyOriginal() }
             )
         }
     }
 
     private var editor: some View {
-        TextEditor(text: Binding(
-            get: { viewModel.draftOriginal },
-            set: { value in viewModel.updateDraftOriginal(value) }
-        ))
+        TextField(
+            L10n.string(
+                "panel.manual_input_placeholder",
+                defaultValue: "Enter or paste the text to translate…"
+            ),
+            text: Binding(
+                get: { viewModel.activeOriginalText },
+                set: { value in viewModel.updateActiveOriginalText(value) }
+            ),
+            axis: .vertical
+        )
         .font(.system(size: 13))
         .lineSpacing(2)
-        .scrollContentBackground(.hidden)
+        .lineLimit(4...6)
+        .textFieldStyle(.plain)
         .padding(.horizontal, 8)
         .padding(.vertical, 7)
         .background(Color.primary.opacity(0.028), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
@@ -120,25 +148,26 @@ private struct OriginalEditorCard: View {
             RoundedRectangle(cornerRadius: 9, style: .continuous)
                 .strokeBorder(editorBorderColor, lineWidth: 1)
         }
-        .frame(minHeight: 92, maxHeight: 152)
+        .frame(height: 98)
+        .focused($isEditorFocused)
         .disabled(viewModel.isRetranslating)
     }
 
     private var footer: some View {
         HStack(spacing: 8) {
-            Text(L10n.string(
+            Text(hint ?? L10n.string(
                 "panel.edit_hint",
                 defaultValue: "Edit the original, then translate again."
             ))
             .font(.system(size: 12))
             .lineLimit(1)
-            .foregroundStyle(viewModel.isDraftTooLong ? Color.red : Color.secondary)
+            .foregroundStyle(viewModel.isEditorTextTooLong ? Color.red : Color.secondary)
             Spacer()
-            Text("\(viewModel.draftOriginal.count) / \(TranslationViewModel.maximumEditableCharacterCount)")
+            Text("\(viewModel.editorCharacterCount) / \(TranslationViewModel.maximumEditableCharacterCount)")
                 .font(.system(size: 12, design: .monospaced))
-                .foregroundStyle(viewModel.isDraftTooLong ? Color.red : Color.secondary.opacity(0.75))
+                .foregroundStyle(viewModel.isEditorTextTooLong ? Color.red : Color.secondary.opacity(0.75))
             Button {
-                viewModel.retranslateDraft()
+                viewModel.translateFromEditor()
             } label: {
                 if viewModel.isRetranslating {
                     ProgressView()
@@ -146,29 +175,40 @@ private struct OriginalEditorCard: View {
                         .frame(width: 16, height: 16)
                 } else {
                     Label(
-                        L10n.string("panel.retranslate", defaultValue: "Translate Again"),
-                        systemImage: "arrow.clockwise"
+                        viewModel.translateButtonTitle,
+                        systemImage: viewModel.isManualEditMode ? "arrow.right.circle.fill" : "arrow.clockwise"
                     )
                 }
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.regular)
             .font(.system(size: 12, weight: .medium))
-            .disabled(!viewModel.canRetranslate)
+            .disabled(!viewModel.canTranslateFromEditor)
             .keyboardShortcut(.return, modifiers: [.command])
         }
     }
 
     private var editorBorderColor: Color {
-        viewModel.isDraftTooLong ? Color.red.opacity(0.8) : Color.primary.opacity(0.10)
+        if viewModel.isEditorTextTooLong { return Color.red.opacity(0.8) }
+        return isEditorFocused ? Color.accentColor.opacity(0.45) : Color.primary.opacity(0.10)
+    }
+
+    private var isOriginalCopied: Bool {
+        if case .success(_, _, _, _, let copied) = viewModel.state, copied == .original { return true }
+        return false
     }
 }
 
 private struct TranslationResultCard: View {
     @ObservedObject var viewModel: TranslationViewModel
-    let translated: String
-    let copied: Bool
+    let translated: String?
+    let statusMessage: String?
     @ObservedObject var speechController: TextSpeechController
+
+    private var isTranslationCopied: Bool {
+        if case .success(_, _, _, _, let copied) = viewModel.state, copied == .translation { return true }
+        return false
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -184,8 +224,9 @@ private struct TranslationResultCard: View {
                         ? L10n.string("panel.stop_reading", defaultValue: "Stop Reading")
                         : L10n.string("panel.read_translation", defaultValue: "Read Translation"),
                     isSpeaking: speechController.activeTarget == .translation,
-                    isDisabled: translated.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                    isDisabled: translated?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true,
                     action: {
+                        guard let translated else { return }
                         speechController.toggle(
                             target: .translation,
                             text: translated,
@@ -194,24 +235,43 @@ private struct TranslationResultCard: View {
                     }
                 )
                 PanelActionButton(
-                    title: copied
+                    title: isTranslationCopied
                         ? L10n.string("panel.copied", defaultValue: "Copied")
                         : L10n.string("panel.copy_translation", defaultValue: "Copy Translation"),
-                    systemImage: copied ? "checkmark" : "doc.on.doc",
-                    isConfirmed: copied,
+                    systemImage: isTranslationCopied ? "checkmark" : "doc.on.doc",
+                    isConfirmed: isTranslationCopied,
+                    isDisabled: translated == nil,
                     action: { viewModel.copyTranslation() }
                 )
             }
-            ScrollView {
-                Text(translated)
-                    .font(.system(size: 14))
-                    .lineSpacing(3)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.trailing, 8)
+            if let translated {
+                ScrollView {
+                    Text(translated)
+                        .font(.system(size: 14))
+                        .lineSpacing(3)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.trailing, 8)
+                }
+            } else if let statusMessage {
+                HStack(spacing: 9) {
+                    ProgressView().controlSize(.small)
+                    Text(statusMessage)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+                .padding(.top, 4)
+            } else {
+                Text(L10n.string(
+                    "panel.translation_placeholder",
+                    defaultValue: "The translation will appear here."
+                ))
+                .font(.system(size: 12))
+                .foregroundStyle(.tertiary)
             }
         }
-        .frame(maxHeight: .infinity)
+        .frame(maxHeight: .infinity, alignment: .top)
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
         .background(Color.accentColor.opacity(0.028))
@@ -264,7 +324,8 @@ private extension View {
 private struct PanelActionButton: View {
     let title: String
     let systemImage: String
-    let isConfirmed: Bool
+    var isConfirmed: Bool
+    var isDisabled: Bool
     let action: () -> Void
 
     @State private var isHovering = false
@@ -286,6 +347,8 @@ private struct PanelActionButton: View {
                 .foregroundStyle(isConfirmed ? Color.green : Color.primary)
         }
         .buttonStyle(.plain)
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.42 : 1)
         .onHover { hovering in
             withAnimation(.easeOut(duration: 0.12)) {
                 isHovering = hovering

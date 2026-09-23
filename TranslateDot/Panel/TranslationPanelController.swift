@@ -53,6 +53,12 @@ final class TranslationPanelController: NSObject, NSWindowDelegate {
         if panel.frame.size != desiredSize {
             panel.setContentSize(desiredSize)
         }
+        // Keep the user's placement while the panel is already on screen;
+        // only compute a fresh anchor position when it reappears.
+        guard !panel.isVisible else {
+            panel.orderFrontRegardless()
+            return
+        }
         let frames = NSScreen.screens.map(\.visibleFrame)
         let placement = positioner.placement(
             panelSize: panel.frame.size,

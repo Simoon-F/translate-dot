@@ -213,7 +213,11 @@ final class TranslationViewModel: ObservableObject {
     }
 
     func copyOriginal() {
-        copy(.original)
+        if isManualEditMode {
+            copyManualOriginal()
+        } else {
+            copy(.original)
+        }
     }
 
     func copyTranslation() {
@@ -274,6 +278,50 @@ final class TranslationViewModel: ObservableObject {
         manualInputText.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    var isManualEditMode: Bool {
+        if case .manualInput = state { return true }
+        return false
+    }
+
+    var activeOriginalText: String {
+        isManualEditMode ? manualInputText : draftOriginal
+    }
+
+    func updateActiveOriginalText(_ text: String) {
+        if isManualEditMode {
+            updateManualInput(text)
+        } else {
+            updateDraftOriginal(text)
+        }
+    }
+
+    var isEditorTextTooLong: Bool {
+        isManualEditMode ? isManualInputTooLong : isDraftTooLong
+    }
+
+    var editorCharacterCount: Int {
+        activeOriginalText.count
+    }
+
+    var canTranslateFromEditor: Bool {
+        isManualEditMode ? canSubmitManualInput : canRetranslate
+    }
+
+    func translateFromEditor() {
+        if isManualEditMode {
+            submitManualInput()
+        } else {
+            retranslateDraft()
+        }
+    }
+
+    var translateButtonTitle: String {
+        if case .manualInput = state {
+            return L10n.string("panel.translate", defaultValue: "Translate")
+        }
+        return L10n.string("panel.retranslate", defaultValue: "Translate Again")
+    }
+
     private func copy(_ target: TranslationCopyTarget) {
         guard case .success(let original, let translated, let source, let targetLanguage, _) = state else { return }
         pasteboard.clearContents()
@@ -285,6 +333,12 @@ final class TranslationViewModel: ObservableObject {
             target: targetLanguage,
             copied: target
         )
+    }
+
+    private func copyManualOriginal() {
+        guard !manualInputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        pasteboard.clearContents()
+        pasteboard.setString(manualInputText, forType: .string)
     }
 
     func openAccessibilitySettings() {
