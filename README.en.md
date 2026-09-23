@@ -31,6 +31,7 @@ Core flow: **select text or a screen region → press a hotkey → local recogni
 - On-device translation through the Apple Translation framework, including system language model preparation and download flows
 - A Language Models settings page shows installation status, prepares English–Chinese models in advance, and links to system model management
 - Automatic source-language detection: Chinese (Simplified/Traditional, Cantonese) is translated to English, other languages to Simplified Chinese; source language, default target language, and automatic reverse target are all customizable, with the language list provided by the system's Apple Translation
+- The “source → target” bar at the top of the translation window is clickable: switching languages there is saved automatically and reused for the next translation
 
 **UI and experience**
 

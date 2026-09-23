@@ -218,10 +218,12 @@ struct LanguageModelsView: View {
     private func refreshStatuses() async {
         isRefreshing = true
         let targetIdentifier = settings.targetLanguageIdentifier
-        let target = Locale.Language(identifier: targetIdentifier)
         pairs = settings.supportedLanguageIdentifiers
             .filter { identifier in
-                !LanguageRouter.sameLanguageFamily(Locale.Language(identifier: identifier), target)
+                // Keep sibling variants (e.g. Traditional Chinese when the target is
+                // Simplified Chinese) because variant-to-variant translation is
+                // supported; only the exact target itself is not a meaningful pair.
+                identifier != targetIdentifier
             }
             .map { LanguageModelPair(sourceIdentifier: $0, targetIdentifier: targetIdentifier) }
 

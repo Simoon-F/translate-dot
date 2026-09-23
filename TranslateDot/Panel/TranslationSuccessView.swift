@@ -17,7 +17,9 @@ struct TranslationPanelContent: View {
                 source: source ?? L10n.string("language.auto_detect", defaultValue: "Auto-detect"),
                 target: target ?? AppSettings.shared.languageDisplayName(
                     for: AppSettings.shared.targetLanguageIdentifier
-                )
+                ),
+                settings: AppSettings.shared,
+                onLanguageChanged: { viewModel.retranslateWithCurrentLanguages() }
             )
             Divider().opacity(0.45)
             OriginalEditorCard(
@@ -43,20 +45,46 @@ struct TranslationPanelContent: View {
 struct LanguageRouteBar: View {
     let source: String
     let target: String
+    let settings: AppSettings
+    let onLanguageChanged: () -> Void
 
     var body: some View {
         HStack(spacing: 9) {
             Image(systemName: "globe.asia.australia.fill")
                 .foregroundStyle(.tint)
-            Text(source)
-                .lineLimit(1)
-                .fontWeight(.medium)
+            LanguagePickerMenu(
+                selection: Binding(
+                    get: { settings.sourceLanguageIdentifier },
+                    set: { identifier in
+                        guard identifier != settings.sourceLanguageIdentifier else { return }
+                        settings.sourceLanguageIdentifier = identifier
+                        onLanguageChanged()
+                    }
+                ),
+                label: source,
+                options: settings.supportedLanguageIdentifiers,
+                displayName: { settings.languageDisplayName(for: $0) },
+                includesAutoDetect: true,
+                helpText: L10n.string("panel.choose_source_language", defaultValue: "Choose Source Language")
+            )
             Image(systemName: "arrow.right")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.tertiary)
-            Text(target)
-                .lineLimit(1)
-                .fontWeight(.medium)
+            LanguagePickerMenu(
+                selection: Binding(
+                    get: { settings.targetLanguageIdentifier },
+                    set: { identifier in
+                        guard identifier != settings.targetLanguageIdentifier else { return }
+                        settings.targetLanguageIdentifier = identifier
+                        onLanguageChanged()
+                    }
+                ),
+                label: target,
+                options: settings.supportedLanguageIdentifiers,
+                displayName: { settings.languageDisplayName(for: $0) },
+                includesAutoDetect: false,
+                helpText: L10n.string("panel.choose_target_language", defaultValue: "Choose Target Language")
+            )
             Spacer()
             Text("⌘↩")
                 .foregroundStyle(.tertiary)
@@ -65,6 +93,52 @@ struct LanguageRouteBar: View {
         .padding(.horizontal, 20)
         .frame(height: 44)
         .background(Color.primary.opacity(0.018))
+    }
+}
+
+/// A compact language selector shown in the panel header. Choosing a language
+/// updates the persisted settings so the same pair is used next time.
+private struct LanguagePickerMenu: View {
+    @Binding var selection: String
+    let label: String
+    let options: [String]
+    let displayName: (String) -> String
+    var includesAutoDetect: Bool = false
+    let helpText: String
+
+    var body: some View {
+        Menu {
+            Picker(selection: $selection) {
+                if includesAutoDetect {
+                    Text(L10n.string("language.auto_detect", defaultValue: "Auto-detect"))
+                        .tag("")
+                }
+                ForEach(options, id: \.self) { identifier in
+                    Text(displayName(identifier))
+                        .tag(identifier)
+                }
+            } label: {
+                EmptyView()
+            }
+            .pickerStyle(.inline)
+            .labelsHidden()
+        } label: {
+            HStack(spacing: 3) {
+                Text(label)
+                    .lineLimit(1)
+                    .fontWeight(.medium)
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 8, weight: .semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .contentShape(Rectangle())
+        }
+        .menuStyle(.button)
+        .buttonStyle(.borderless)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .help(helpText)
+        .accessibilityLabel(label)
     }
 }
 

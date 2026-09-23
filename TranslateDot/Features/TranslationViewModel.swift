@@ -257,6 +257,18 @@ final class TranslationViewModel: ObservableObject {
         onRetranslate?(draftOriginal.trimmingCharacters(in: .whitespacesAndNewlines))
     }
 
+    /// Retranslates the visible content with the current language settings,
+    /// used after the user changes languages directly in the panel.
+    func retranslateWithCurrentLanguages() {
+        if isManualEditMode {
+            submitManualInput()
+            return
+        }
+        let text = draftOriginal.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        onRetranslate?(text)
+    }
+
     func updateManualInput(_ text: String) {
         manualInputText = text
     }

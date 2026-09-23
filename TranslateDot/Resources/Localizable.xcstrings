@@ -412,6 +412,38 @@
         }
       }
     },
+    "panel.choose_source_language" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Source Language"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择源语言"
+          }
+        }
+      }
+    },
+    "panel.choose_target_language" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Target Language"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择目标语言"
+          }
+        }
+      }
+    },
     "panel.close" : {
       "extractionState" : "stale",
       "localizations" : {
