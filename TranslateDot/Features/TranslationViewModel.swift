@@ -20,6 +20,7 @@ enum TranslationViewState: Equatable {
     case manualInput(hint: String)
     case unsupported(message: String)
     case failure(message: String)
+    case modelDownloadRequired(original: String, sourceLabel: String, targetLabel: String)
 }
 
 @MainActor
@@ -39,6 +40,7 @@ final class TranslationViewModel: ObservableObject {
     var onRetryScreenCapture: (() -> Void)?
     var onRetranslate: ((String) -> Void)?
     var onManualTranslate: ((String) -> Void)?
+    var onDownloadModel: (() -> Void)?
     var onDismiss: (() -> Void)?
 
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.simon.translatedot", category: "ViewModel")
@@ -210,6 +212,28 @@ final class TranslationViewModel: ObservableObject {
         if requestID == nil { cancelAndResetRequest() }
         isRetranslating = false
         state = .unsupported(message: message)
+    }
+
+    /// Shown instead of auto-presenting the system download dialog: the user
+    /// explicitly decides whether to download the model or switch languages.
+    func showModelDownloadRequired(
+        for request: TranslationRequest,
+        sourceLabel: String,
+        targetLabel: String
+    ) {
+        guard currentRequestID == request.id else { return }
+        draftOriginal = request.text
+        isRetranslating = false
+        state = .modelDownloadRequired(
+            original: request.text,
+            sourceLabel: sourceLabel,
+            targetLabel: targetLabel
+        )
+        logger.debug("State changed to model download required")
+    }
+
+    func downloadModel() {
+        onDownloadModel?()
     }
 
     func copyOriginal() {

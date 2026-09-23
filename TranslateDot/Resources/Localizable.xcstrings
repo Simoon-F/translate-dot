@@ -72,6 +72,22 @@
         }
       }
     },
+    "error.model_download_cancelled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The language model download was cancelled. Pick another language above, or translate again to download the model."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已取消语言模型下载。可以在上方切换语言，或重新发起翻译以下载模型。"
+          }
+        }
+      }
+    },
     "error.no_selection" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -85,6 +101,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "请先选择需要翻译的文本。"
+          }
+        }
+      }
+    },
+    "error.model_not_installed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The language model for this pair isn't downloaded yet. Pick another language above, or try again to download it."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "该语言组合的模型尚未下载。可以在上方切换语言，或重试以下载模型。"
           }
         }
       }
@@ -678,6 +710,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "调整窗口大小"
+          }
+        }
+      }
+    },
+    "panel.language_retry_hint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can pick a different source or target language above, then try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可以在上方切换源语言或目标语言，然后重试。"
+          }
+        }
+      }
+    },
+    "panel.download_model" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Language Model"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下载语言模型"
+          }
+        }
+      }
+    },
+    "panel.model_download_message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The model for %1$@ → %2$@ isn't downloaded yet. Download it to translate, or pick another language above."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@ → %2$@”的语言模型尚未下载。可下载模型后翻译，或在上方直接切换其他语言。"
+          }
+        }
+      }
+    },
+    "panel.model_download_title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language Model Needed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要下载语言模型"
           }
         }
       }

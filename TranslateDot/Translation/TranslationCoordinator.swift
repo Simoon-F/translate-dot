@@ -15,6 +15,7 @@ final class TranslationCoordinator: ObservableObject {
 
     enum HostFailure: Sendable {
         case unsupportedLanguage
+        case modelNotInstalled
         case unableToIdentifyLanguage
         case nothingToTranslate
         case framework
@@ -80,7 +81,20 @@ final class TranslationCoordinator: ObservableObject {
                 route: route,
                 needsPreparation: status == .supported
             )
-            triggerTranslation(for: route)
+            if status == .supported {
+                // Do not auto-present the system download dialog: ask first and
+                // let the user switch languages or download explicitly.
+                viewModel.showModelDownloadRequired(
+                    for: request,
+                    sourceLabel: route.source.map(Self.displayName(for:)) ?? L10n.string(
+                        "language.auto_detect",
+                        defaultValue: "Auto-detect"
+                    ),
+                    targetLabel: Self.displayName(for: route.target)
+                )
+            } else {
+                triggerTranslation(for: route)
+            }
         } catch is CancellationError {
             logger.debug("Translation preflight cancelled")
         } catch let error as TranslationWorkflowError {
@@ -110,6 +124,14 @@ final class TranslationCoordinator: ObservableObject {
         return pending
     }
 
+    /// Presents the system download dialog on explicit user request
+    /// (the "Download Language Model" button in the panel).
+    func downloadModelForCurrentRequest() {
+        guard let pending, pending.request.id == currentRequestID else { return }
+        logger.info("User requested model download source=\\(pending.route.source?.minimalIdentifier ?? \"auto\", privacy: .public) target=\\(pending.route.target.minimalIdentifier, privacy: .public)")
+        triggerTranslation(for: pending.route)
+    }
+
     func translationWillPrepare(_ work: Work) {
         guard work.request.id == currentRequestID else { return }
         viewModel.showPreparing(for: work.request)
@@ -117,6 +139,7 @@ final class TranslationCoordinator: ObservableObject {
 
     func translationDidComplete(_ work: Work, response: TranslationSession.Response) {
         guard work.request.id == currentRequestID else { return }
+        pending = nil
         let translated = response.targetText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !translated.isEmpty else {
             viewModel.showFailure(TranslationWorkflowError.emptyResult.userMessage, requestID: work.request.id)
@@ -139,7 +162,23 @@ final class TranslationCoordinator: ObservableObject {
 
     func translationDidFail(_ work: Work, failure: HostFailure) {
         guard work.request.id == currentRequestID else { return }
+        // Any terminal failure ends the translation task; without clearing the
+        // configuration SwiftUI re-runs it and may re-present the download sheet.
+        configuration = nil
+        // The framework re-runs the translation task after invalidation; with no
+        // pending work the re-run is a no-op instead of re-prompting a download.
+        pending = nil
         switch failure {
+        case .modelNotInstalled:
+            logger.error("Translation framework error type: modelNotInstalled")
+            viewModel.showFailure(
+                L10n.string(
+                    "error.model_not_installed",
+                    defaultValue: "The language model for this pair isn't downloaded yet. Pick another language above, or try again to download it."
+                ),
+                requestID: work.request.id
+            )
+            return
         case .unsupportedLanguage:
             logger.error("Translation framework error type: unsupportedLanguage")
             viewModel.showUnsupported(TranslationWorkflowError.unsupportedLanguagePair.userMessage, requestID: work.request.id)
@@ -172,6 +211,21 @@ final class TranslationCoordinator: ObservableObject {
     func translationWasCancelled(_ work: Work) {
         guard work.request.id == currentRequestID else { return }
         logger.debug("Translation host task cancelled")
+        // Clearing the configuration stops SwiftUI's translation task so the
+        // system model-download sheet is not presented again after the user
+        // dismisses it (e.g. with Esc). The failure view keeps the language
+        // bar visible so another installed language can be chosen instead.
+        configuration = nil
+        // Same as translationDidFail: without this, the framework-triggered
+        // task re-run after the sheet is dismissed would present it again.
+        pending = nil
+        viewModel.showFailure(
+            L10n.string(
+                "error.model_download_cancelled",
+                defaultValue: "The language model download was cancelled. Pick another language above, or translate again to download the model."
+            ),
+            requestID: work.request.id
+        )
     }
 
     private static func displayName(for language: Locale.Language) -> String {

@@ -67,6 +67,9 @@ final class AppState {
         viewModel.onManualTranslate = { [weak self] text in
             self?.translateManualText(text)
         }
+        viewModel.onDownloadModel = { [weak self] in
+            self?.coordinator.downloadModelForCurrentRequest()
+        }
         viewModel.onDismiss = { [weak panelController] in
             panelController?.hide()
         }

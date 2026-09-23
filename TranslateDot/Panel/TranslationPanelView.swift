@@ -121,18 +121,80 @@ struct TranslationPanelView: View {
             TranslationPanelContent(viewModel: viewModel, hint: hint)
 
         case .unsupported(let message):
-            messageView(
+            languageSwitchableMessageView(
                 icon: "exclamationmark.bubble",
                 title: L10n.string("panel.unsupported_title", defaultValue: "Not Supported"),
                 message: message
             )
 
+        case .modelDownloadRequired(_, let sourceLabel, let targetLabel):
+            modelDownloadView(sourceLabel: sourceLabel, targetLabel: targetLabel)
+
         case .failure(let message):
-            messageView(
+            languageSwitchableMessageView(
                 icon: "exclamationmark.triangle",
                 title: L10n.string("panel.failure_title", defaultValue: "Translation Incomplete"),
                 message: message
             )
+        }
+    }
+
+    /// Failure states keep the language bar visible so the user can switch to
+    /// another installed language and retry without leaving the panel — e.g.
+    /// after dismissing the system model-download prompt.
+    private func languageSwitchableMessageView(icon: String, title: String, message: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            languageRouteBar
+            Divider().opacity(0.45)
+            messageView(
+                icon: icon,
+                title: title,
+                message: message + "\n\n" + L10n.string(
+                    "panel.language_retry_hint",
+                    defaultValue: "You can pick a different source or target language above, then try again."
+                )
+            )
+        }
+    }
+
+    private var languageRouteBar: some View {
+        LanguageRouteBar(
+            source: AppSettings.shared.sourceLanguageIdentifier.isEmpty
+                ? L10n.string("language.auto_detect", defaultValue: "Auto-detect")
+                : AppSettings.shared.languageDisplayName(for: AppSettings.shared.sourceLanguageIdentifier),
+            target: AppSettings.shared.languageDisplayName(
+                for: AppSettings.shared.targetLanguageIdentifier
+            ),
+            settings: AppSettings.shared,
+            onLanguageChanged: { viewModel.retranslateWithCurrentLanguages() }
+        )
+    }
+
+    private func modelDownloadView(sourceLabel: String, targetLabel: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            languageRouteBar
+            Divider().opacity(0.45)
+            VStack(alignment: .leading, spacing: 12) {
+                Label(
+                    L10n.string("panel.model_download_title", defaultValue: "Language Model Needed"),
+                    systemImage: "arrow.down.circle"
+                )
+                    .font(.system(size: 14, weight: .semibold))
+                Text(L10n.formatted(
+                    "panel.model_download_message",
+                    defaultValue: "The model for %@ → %@ isn't downloaded yet. Download it to translate, or pick another language above.",
+                    sourceLabel,
+                    targetLabel
+                ))
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button(L10n.string("panel.download_model", defaultValue: "Download Language Model")) {
+                    viewModel.downloadModel()
+                }
+                    .buttonStyle(.borderedProminent)
+            }
+            .padding(20)
         }
     }
 

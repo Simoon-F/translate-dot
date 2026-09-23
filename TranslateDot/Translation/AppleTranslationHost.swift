@@ -28,6 +28,14 @@ struct AppleTranslationHost<Content: View>: View {
                 } catch is CancellationError {
                     coordinator.translationWasCancelled(work)
                 } catch let error as TranslationError {
+                    if #available(macOS 26.0, *) {
+                        if TranslationError.alreadyCancelled ~= error {
+                            // The user dismissed the system model-download sheet.
+                            coordinator.translationWasCancelled(work)
+                            return
+                        }
+                    }
+
                     let failure: TranslationCoordinator.HostFailure
                     if TranslationError.unsupportedSourceLanguage ~= error
                         || TranslationError.unsupportedTargetLanguage ~= error
@@ -37,6 +45,9 @@ struct AppleTranslationHost<Content: View>: View {
                         failure = .unableToIdentifyLanguage
                     } else if TranslationError.nothingToTranslate ~= error {
                         failure = .nothingToTranslate
+                    } else if #available(macOS 26.0, *),
+                              TranslationError.notInstalled ~= error {
+                        failure = .modelNotInstalled
                     } else {
                         failure = .framework
                     }
