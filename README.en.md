@@ -1,6 +1,14 @@
+<div align="center">
+
+<img src="TranslateDot/Resources/Brand/TranslateDotIconMaster.png" width="128" alt="TranslateDot icon" />
+
 # TranslateDot
 
-<div align="center">
+![macOS](https://img.shields.io/badge/macOS-15.0%2B-black?logo=apple&logoColor=white)
+![Swift](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)
+![Xcode](https://img.shields.io/badge/Xcode-16%2B-147EFB?logo=xcode&logoColor=white)
+![Translation](https://img.shields.io/badge/Translation-Apple%20Translation-blue)
+![Privacy](https://img.shields.io/badge/Privacy-100%25%20on--device-success)
 
 **Lightweight, fully local selection and screenshot translation for macOS**
 
@@ -12,6 +20,22 @@ Select text in any app, and the translation appears instantly in a floating pane
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+  - [Text capture and translation](#text-capture-and-translation)
+  - [UI and experience](#ui-and-experience)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+  - [Command-line build and test](#command-line-build-and-test)
+- [System Permissions](#system-permissions)
+- [Privacy](#privacy)
+- [Known Limitations](#known-limitations)
+- [Troubleshooting](#troubleshooting)
+- [Development](#development)
+- [Roadmap](#roadmap)
+
 ## Overview
 
 TranslateDot is a native macOS menu bar app. It reads the current text selection through the macOS Accessibility API, translates it on-device with the Apple Translation framework, and presents the result in a non-activating floating panel — without interrupting your workflow and without any cloud translation service.
@@ -22,7 +46,7 @@ Core flow: **select text or a screen region → press a hotkey → local recogni
 
 ## Features
 
-**Text capture and translation**
+### Text capture and translation
 
 - Global hotkey ⌥D (default; re-recordable in Settings)
 - Screenshot translation with ⌥S: drag over a screen region, run OCR locally with Apple Vision, then translate automatically
@@ -33,7 +57,7 @@ Core flow: **select text or a screen region → press a hotkey → local recogni
 - Automatic source-language detection: Chinese (Simplified/Traditional, Cantonese) is translated to English, other languages to Simplified Chinese; source language, default target language, and automatic reverse target are all customizable, with the language list provided by the system's Apple Translation
 - The “source → target” bar at the top of the translation window is clickable: switching languages there is saved automatically and reused for the next translation
 
-**UI and experience**
+### UI and experience
 
 - Menu bar resident, no Dock icon (`LSUIElement`)
 - Non-activating `NSPanel` with multi-display, Space, and full-screen support

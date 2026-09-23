@@ -1,6 +1,14 @@
+<div align="center">
+
+<img src="TranslateDot/Resources/Brand/TranslateDotIconMaster.png" width="128" alt="TranslateDot 图标" />
+
 # TranslateDot
 
-<div align="center">
+![macOS](https://img.shields.io/badge/macOS-15.0%2B-black?logo=apple&logoColor=white)
+![Swift](https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white)
+![Xcode](https://img.shields.io/badge/Xcode-16%2B-147EFB?logo=xcode&logoColor=white)
+![Translation](https://img.shields.io/badge/Translation-Apple%20Translation-blue)
+![Privacy](https://img.shields.io/badge/Privacy-100%25%20on--device-success)
 
 **轻量、完全本地的 macOS 划词与截图翻译工具**
 
@@ -12,6 +20,22 @@
 
 ---
 
+## 目录
+
+- [概述](#概述)
+- [功能特性](#功能特性)
+  - [取词与翻译](#取词与翻译)
+  - [界面与体验](#界面与体验)
+- [系统要求](#系统要求)
+- [快速开始](#快速开始)
+  - [命令行构建与测试](#命令行构建与测试)
+- [系统权限说明](#系统权限说明)
+- [隐私](#隐私)
+- [已知限制](#已知限制)
+- [故障排查](#故障排查)
+- [开发](#开发)
+- [Roadmap](#roadmap)
+
 ## 概述
 
 TranslateDot 是一款原生 macOS 菜单栏应用。它通过 Accessibility API 读取当前应用中的选中文本，调用 Apple Translation framework 在本机完成翻译，并以非激活式悬浮面板呈现结果——全程不打断当前工作流，不依赖任何云端翻译服务。
@@ -22,7 +46,7 @@ TranslateDot 是一款原生 macOS 菜单栏应用。它通过 Accessibility API
 
 ## 功能特性
 
-**取词与翻译**
+### 取词与翻译
 
 - 全局快捷键 ⌥D（默认值，可在设置中自定义录制）
 - 截图翻译快捷键 ⌥S：拖动框选屏幕区域，使用 Apple Vision 在本机 OCR 后自动翻译
@@ -33,7 +57,7 @@ TranslateDot 是一款原生 macOS 菜单栏应用。它通过 Accessibility API
 - 自动识别源语言：中文（含简繁体、粤语）译为英文，其他语言译为简体中文；源语言、默认目标语言与自动反向目标语言均可自定义，语言列表来自当前系统的 Apple Translation
 - 翻译窗口顶部的“源语言 → 目标语言”可直接点击切换，选择结果自动保存并在下次翻译时沿用
 
-**界面与体验**
+### 界面与体验
 
 - 菜单栏常驻，不显示 Dock 图标（`LSUIElement`）
 - 非激活式 `NSPanel`，支持多显示器、Space 与全屏应用
